@@ -1,0 +1,4 @@
+Info (10281): Verilog HDL Declaration information at UART_wrapper.sv(5): object "RDY" differs only in case from object "rdy" in the same scope
+Info (10281): Verilog HDL Declaration information at UART_tx.sv(9): object "LOAD" differs only in case from object "load" in the same scope
+Info (10281): Verilog HDL Declaration information at rst_synch.sv(3): object "RST_n" differs only in case from object "rst_n" in the same scope
+Info (10281): Verilog HDL Declaration information at CommTB.sv(3): object "RST_n" differs only in case from object "rst_n" in the same scope

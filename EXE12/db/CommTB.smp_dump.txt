@@ -1,0 +1,25 @@
+
+State Machine - |CommTB|UART_wrapper:iUART|state
+Name state.HIGH state.RDY state.LOW 
+state.HIGH 0 0 0 
+state.LOW 1 0 1 
+state.RDY 1 1 0 
+
+State Machine - |CommTB|UART_wrapper:iUART|UART:iDUT_UART|UART_tx:iDUT_tx|state
+Name state.IDLE state.TRAN state.LOAD 
+state.IDLE 0 0 0 
+state.LOAD 1 0 1 
+state.TRAN 1 1 0 
+
+State Machine - |CommTB|CommMaster:iCM|state
+Name state.CMD_SEND state.SEND_LOW state.SEND_HIGH state.IDLE 
+state.IDLE 0 0 0 0 
+state.SEND_HIGH 0 0 1 1 
+state.SEND_LOW 0 1 0 1 
+state.CMD_SEND 1 0 0 1 
+
+State Machine - |CommTB|CommMaster:iCM|UART_tx:iDUT_tx|state
+Name state.IDLE state.TRAN state.LOAD 
+state.IDLE 0 0 0 
+state.LOAD 1 0 1 
+state.TRAN 1 1 0 

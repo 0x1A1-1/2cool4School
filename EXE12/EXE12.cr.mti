@@ -1,0 +1,57 @@
+I:/551/EXE12/rst_synch.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/EXE12/rst_synch.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module rst_synch
+
+Top level modules:
+	rst_synch
+
+} {} {}} I:/551/EXE12/UART_rx.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/EXE12/UART_rx.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module UART_rx
+
+Top level modules:
+	UART_rx
+
+} {} {}} I:/551/EXE12/CommTB.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/EXE12/CommTB.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module CommTB
+
+Top level modules:
+	CommTB
+
+} {} {}} I:/551/EXE12/pos_detect.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/EXE12/pos_detect.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module PE_detect
+
+Top level modules:
+	PE_detect
+
+} {} {}} I:/551/EXE12/UART_tx.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/EXE12/UART_tx.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module UART_tx
+
+Top level modules:
+	UART_tx
+
+} {} {}} I:/551/EXE12/CommMaster.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/EXE12/CommMaster.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module CommMaster
+
+Top level modules:
+	CommMaster
+
+} {} {}} I:/551/EXE12/bit_counter_16.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/EXE12/bit_counter_16.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module bit_counter_16
+
+Top level modules:
+	bit_counter_16
+
+} {} {}} I:/551/EXE12/UART.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/EXE12/UART.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module UART
+
+Top level modules:
+	UART
+
+} {} {}}

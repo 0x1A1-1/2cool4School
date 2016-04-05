@@ -1,0 +1,68 @@
+# Reading C:/ProgramData/App-V/2191B702-5279-4048-91BA-BCF8F2A20B49/21710E5E-1DEB-4C76-9578-9609978C17F5/Root/tcl/vsim/pref.tcl
+# //  ModelSim SE 10.3c Jul 19 2014 
+# //
+# //  Copyright 1991-2014 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION
+# //  WHICH IS THE PROPERTY OF MENTOR GRAPHICS CORPORATION OR ITS
+# //  LICENSORS AND IS SUBJECT TO LICENSE TERMS.
+# //
+# OpenFile I:/551/EXE12/EXE12.mpf
+# Loading project EXE12
+vsim -novopt work.CommTB
+# vsim -gui I:\551\EXE12\EXE12.mpf 
+# Start time: 10:49:16 on Apr 05,2016
+# ** Warning: (vsim-8891) All optimizations are turned off because the -novopt switch is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features please see the User's Manual section on Preserving Object Visibility with vopt.
+# 
+# Refreshing I:/551/EXE12/work.CommTB
+# Loading sv_std.std
+# Loading work.CommTB
+# Refreshing I:/551/EXE12/work.CommMaster
+# Loading work.CommMaster
+# Refreshing I:/551/EXE12/work.UART_tx
+# Loading work.UART_tx
+# Refreshing I:/551/EXE12/work.UART_wrapper
+# Loading work.UART_wrapper
+# Refreshing I:/551/EXE12/work.UART
+# Loading work.UART
+# Refreshing I:/551/EXE12/work.UART_rx
+# Loading work.UART_rx
+# ** Error: (vsim-3033) I:/551/EXE12/CommTB.sv(15): Instantiation of 'PE_detct' failed. The design unit was not found.
+# 
+#         Region: /CommTB
+#         Searched libraries:
+#             I:/551/EXE12/work
+# Refreshing I:/551/EXE12/work.bit_counter_16
+# Loading work.bit_counter_16
+# Refreshing I:/551/EXE12/work.rst_synch
+# Loading work.rst_synch
+# Error loading design
+# Compile of CommMaster.sv was successful.
+# Compile of CommTB.sv was successful.
+# Compile of UART_wrapper.sv was successful.
+# 3 compiles, 0 failed with no errors.
+vsim -novopt work.CommTB
+# vsim 
+# Start time: 10:49:42 on Apr 05,2016
+# ** Warning: (vsim-8891) All optimizations are turned off because the -novopt switch is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features please see the User's Manual section on Preserving Object Visibility with vopt.
+# 
+# Refreshing I:/551/EXE12/work.CommTB
+# Loading sv_std.std
+# Loading work.CommTB
+# Refreshing I:/551/EXE12/work.CommMaster
+# Loading work.CommMaster
+# Loading work.UART_tx
+# Refreshing I:/551/EXE12/work.UART_wrapper
+# Loading work.UART_wrapper
+# Loading work.UART
+# Loading work.UART_rx
+# Refreshing I:/551/EXE12/work.PE_detect
+# Loading work.PE_detect
+# Loading work.bit_counter_16
+# Loading work.rst_synch
+# ** Warning: (vsim-3015) I:/551/EXE12/UART_wrapper.sv(14): [PCDPC] - Port size (8) does not match connection size (1) for port 'tx_data'. The port definition is at: I:/551/EXE12/UART.sv(1).
+# 
+#         Region: /CommTB/iUART/iDUT_UART
+# End time: 10:55:06 on Apr 05,2016, Elapsed time: 0:05:24
+# Errors: 0, Warnings: 2
