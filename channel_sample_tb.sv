@@ -1,5 +1,18 @@
 module channel_sample_tb();
 
+logic ref_clk, clk, smpl_clk, clk400MHz;
+logic RST_n, rst_n;
+
+logic VIH_PWM, VIL_PWM;
+logic locked;
+logic [3:0] decimator; 
+
+logic [7:0] smpl1, smpl2, smpl3, smpl4, smpl5;
+logic CH1Hff5, CH1Lff5, CH2Hff5, CH2Lff5, CH3Hff5, CH3Lff5, CH4Hff5, CH4Lff5, CH5Hff5, CH5Lff5;
+logic CH1H, CH1L, CH2H, CH2L, CH3H, CH3L, CH4H, CH4L, CH5H, CH5L;
+logic wrt_smpl;
+
+
 AFE iAFE(.smpl_clk(smpl_clk), .VIH_PWM(VIH_PWM), .VIL_PWM(VIL_PWM), .CH1L(CH1L), .CH1H(CH1H), .CH2L(CH2L), .CH2H(CH2H), .CH3L(CH3L), .CH3H(CH3H), .
            CH4L(CH4L), .CH4H(CH4H), .CH5L(CH5L), .CH5H(CH5H));
 		   
