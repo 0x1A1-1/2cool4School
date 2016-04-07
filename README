@@ -5,3 +5,9 @@ TEAM 2'b10 Cool 3'b100 School
 Project: Logic Analyzer
 
 Team: Xiao, Matt, Christian
+
+
+TODO:
+[] implement state machine logic in cmd_cfg
+[] add set_armed to sensitivity list in always blocks in channel_trigger_logic
+[] check reset values in channel_trigger_logic (else conditions should be 1 instead of 0? how do we know what to reset to?)
