@@ -1,4 +1,4 @@
-module UART_rx_trig(clk, rst_n, RX, baud_cnt, match, mask, UARTtrig);
+module UART_RX_trig(clk, rst_n, RX, baud_cnt, match, mask, UARTtrig);
 
 input clk, rst_n;
 input RX;
@@ -29,7 +29,7 @@ always_ff @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
 		baud_counter <= 0;
 	else if(start) 
-		baud_counter <= 0;
+		baud_counter <= baud_cnt >> 1;
 	else if(shift)
 		baud_counter <= 0; 
 	else if(receiving) 
@@ -42,12 +42,12 @@ always_ff @(posedge clk) begin
 		rx_shift_reg <= {RX, rx_shift_reg[8:1]};
 end
 
-assign shift = (baud_coutner == baud_cnt) ? 1 : 0; 
+assign shift = (baud_counter == baud_cnt) ? 1 : 0; 
 
 /////////// UARTtrig /////////////
 always_ff @(posedge clk, negedge rst_n) begin
 	if(!rst_n) UARTtrig <= 0;
-	else if(rdy) UARTtrig <= ((match[7:0] ^ rx_shift_reg[7:0] & ~mask[7:0]) == 0) ? 1 : 0;
+	else if(rdy) UARTtrig <= (match[7:0] ^ rx_shift_reg[7:0] == mask[7:0]) ? 1 : 0;
 	else UARTtrig <= 0; 
 end
 
