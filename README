@@ -11,3 +11,4 @@ TODO:
 [] implement state machine logic in cmd_cfg
 [] add set_armed to sensitivity list in always blocks in channel_trigger_logic
 [] check reset values in channel_trigger_logic (else conditions should be 1 instead of 0? how do we know what to reset to?)
+[] match and mask checking should be        mask & (match ^ data) == (match ^ data)
