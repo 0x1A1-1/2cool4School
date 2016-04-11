@@ -11,22 +11,10 @@ input rd_done;
 input set_capture_done;
 input [7:0] rdataCH1, rdataCH2, rdataCH3, rdataCH4, rdataCH5;
 
-//I dont think this is how this will work
-//right now i just check the command that comes in but the state machine should react to this
-//it can have some idle state and check for changes in cmd and assert a 
-//write signal as necessary and send the response 
-logic [1:0] command;
-assign command = cmd[15:14];
-logic [5:0] addr;
-assign addr    = cmd[13: 8];
-logic [2:0] channel;
-assign channel = cmd[10: 8];
-logic [7:0] data;
-assign data    = cmd[ 7: 0];
-
 localparam RD = 2'b00;
 localparam WR = 2'b01;
 localparam DUMP = 2'b10;
+localparam RESPOND = 2'b11;
 
 output [7:0] resp;
 output send_resp;
@@ -42,8 +30,32 @@ output reg [4:0] CH1TrigCfg, CH2TrigCfg, CH3TrigCfg, CH4TrigCfg, CH5TrigCfg;
 output reg [7:0] VIL, VIH;
 
 //////////////////////////////////////////////////
+/////           LOGIC                        /////
+//////////////////////////////////////////////////
+logic [1:0] command;
+logic [5:0] addr;
+logic [2:0] channel;
+logic [7:0] data;
+logic wr_reg;
+
+//////////////////////////////////////////////////
 /////           REGISTER BEHAVIORS           /////
 //////////////////////////////////////////////////
+
+//////////// Disect Command //////////////////////
+//I dont think this is how this will work
+//right now i just check the command that comes in but the state machine should react to this
+//it can have some idle state and check for changes in cmd and assert a 
+//write signal as necessary and send the response 
+
+//I think this assign statment is fine, I added a cmd_rdy check in the state mahine that makes
+//sure the cmd is not garbage
+
+//I lied i think we only want to update the command if we ideling
+assign command = (state == IDEL) ? cmd[15:14] : command;
+assign addr    = (state == IDEL) ? cmd[13: 8] : addr;
+assign channel = (state == IDEL) ? cmd[10: 8] : channel;
+assign data    = (state == IDEL) ? cmd[ 7: 0] : data;
 
 //////////// Channel Trig Configuration //////////
 always_ff @(posedge clk, negedge rst_n) begin
@@ -117,6 +129,21 @@ always_ff @(posedge clk, negedge rst_n) begin
 	else if(wr_reg && addr == 6'h10) trig_posL <= data;
 end
 
+/////////// Set Response //////////////////
+//We should somehow set the response to what ever whas in the reg 
+//the user specified to read
+always_ff @(posedge clk, negedge rst_n) begin
+	if(!rst_n) resp	<= 8'h00;
+	else if(state == WRITE) resp <= 8'hA5; //ack the written reg
+	else if(state == READ) resp <= 8'h??; //change to read in data where ever that is
+	else if(state == DUMP) //change response to the reading channel
+			if(channel == 3'b001) resp <= rdataCH1; 
+			else if(channel == 3'b010) resp <= rdataCH2;
+			else if(channel == 3'b011) resp <= rdataCH3;
+			else if(channel == 3'b100) resp <= rdataCH4;
+			else if(channel == 3'b101) resp <= rdataCH5;
+end
+
 /////////// State Machine Logic //////////
 typedef enum reg [2:0] {IDLE, WRITE, READ, DUMP} state_t;
 state_t state, next_state;
@@ -129,25 +156,54 @@ end
 always_comb begin
 	//default outputs
 	wr_reg = 0;
+	strt_rd = 0;
+	send_resp = 0;
+	clr_cmd_rdy = 0;
+	
 	next_state = IDLE;
 
+	//it should only change when cmd_rdy is asserted
 	case(state)	
 		IDLE:
-			if(command == WR) begin
+			if(command == WR && cmd_rdy) begin
 				wr_reg = 1;
 				next_state = WRITE;
 			end
-			else if(command == RD) begin
+			else if(command == RD && cmd_rdy) begin
+				strt_rd = 1;
 				next_state = READ;
 			end
-			else if(command == DUMP) begin
+			else if(command == DUMP && cmd_rdy) begin
+				
 				next_state = DUMP;
 			end
-		WRITE:
-
-		READ:
-
+		WRITE: begin 
+			wr_reg = 1; //do we need to keep wr_reg high?
+			send_resp = 1;
+			next_state = RESPOND;
+			
+			end
+		READ: begin //Where do we read in the data from the registers?
+			if(!rd_done)
+				next_state = READ;
+			else begin
+				send_resp = 1; //should only be high once I think
+				next_state = RESPOND;
+			end
 		DUMP:
+			if(!rd_done)
+				next_state = READ; //where do we read from?
+			else begin
+				send_resp = 1; //should only be high once I think
+				next_state = RESPOND;
+			end
+		RESPOND
+			if(!resp_sent) //wait in write to see if response was sent
+				next_state = RESPOND;
+			else begin
+				next_state = IDLE;
+				clr_cmd_rdy = 1;
+			end
 
 		default:
 
