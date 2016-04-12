@@ -4,8 +4,10 @@ TEAM 2'b10 Cool 3'b100 School
 
 Project: Logic Analyzer
 
-Team: Xiao, Matt, Christian
+Team: Xiao, Matt, Christian, Heng
 
+DONE:
+[-]Q3 & PROOF 
 
 TODO:
 [] implement state machine logic in cmd_cfg
