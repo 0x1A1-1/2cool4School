@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module channel_sample_tb();
 
 logic ref_clk, clk, smpl_clk, clk400MHz;  //ref_clk need to simulate
@@ -17,7 +18,7 @@ pll8x ipll8x(.ref_clk(ref_clk), .RST_n(RST_n), .out_clk(clk400MHz), .locked(lock
 
 clk_rst_smpl iclk_rst_smpl(.clk400MHz(clk400MHz), .RST_n(RST_n), .locked(locked), .decimator(decimator), .clk(clk), .smpl_clk(smpl_clk), .rst_n(rst_n), .wrt_smpl(wrt_smpl));
 
-dual_PWM(.clk(clk), .rst_n(rst_n), VIL, .VIL_PWM(VIL_PWM), .VIH(VIH), .VIH_PWM(VIH_PWM));
+dual_PWM idPWM(.clk(clk), .rst_n(rst_n), .VIL(VIL), .VIL_PWM(VIL_PWM), .VIH(VIH), .VIH_PWM(VIH_PWM));
 
 AFE iAFE(.smpl_clk(smpl_clk), .VIH_PWM(VIH_PWM), .VIL_PWM(VIL_PWM), .CH1L(CH1L), .CH1H(CH1H), .CH2L(CH2L), .CH2H(CH2H), .CH3L(CH3L), .CH3H(CH3H), .
            CH4L(CH4L), .CH4H(CH4H), .CH5L(CH5L), .CH5H(CH5H));
@@ -30,13 +31,15 @@ sampler_reg ch5(.clk(clk), .smpl_clk(smpl_clk), .CH_Low(CH5L), .CH_High(CH5H), .
 	
 initial begin
 	RST_n = 0;
+	#1
+	RST_n = 1;
 	ref_clk = 1;
 	VIH = 8'haa;
 	VIL = 8'h55;
 	decimator = 2;
 end
 
-always #20 ref_clk=~ref_clk;
+always #100 ref_clk=~ref_clk;
 /* If we need the Trig Yet ?	
 channel_trigger_logic ch1Trig(.clk(clk), .set_armed(set_armed), .CHxHff5(CH1Hff5), .CHxLff5(CH1Lff5), .CHxTrigCfg(CH1TrigCfg), .ChxTrig(Ch1Trig));
 channel_trigger_logic ch2Trig(.clk(clk), .set_armed(set_armed), .CHxHff5(CH2Hff5), .CHxLff5(CH2Lff5), .CHxTrigCfg(CH2TrigCfg), .ChxTrig(Ch2Trig));
