@@ -1,7 +1,7 @@
-module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, rdataCH1,rdataCH2, rdataCH3, rdataCH4,
+module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done, rdataCH1,rdataCH2, rdataCH3, rdataCH4,
 		rdataCH5, ram_addr, TrigCfg, CH1TrigCfg, CH2TrigCfg, CH3TrigCfg, CH4TrigCfg, CH5TrigCfg, decimator, VIH,
 		VIL, matchH, matchL, maskH, maskL, baud_cntH, baud_cntL, trig_posH, trig_posL, resp, send_resp, clr_cmd_rdy,
-		strt_rd, waddr); //put list in here 
+		waddr, addr_ptr); //put list in here 
  
 	parameter ENTRIES = 384, LOG2 = 9;	 
  	 
@@ -35,7 +35,7 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  	output logic [7:0] resp; //data send to host as response 
  	output logic send_resp; //initiate transmission to host 
  	output logic clr_cmd_rdy; // used when processing finished 
- 
+ 	output logic [LOG2-1: 0] addr_ptr;//used inside FSM, and also for as output raddr for RAMa
  
  	logic wrt_reg;//asserted when write reg happens 
  	logic [7:0] data; //data to be written 
@@ -43,7 +43,6 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  	logic [1:0] op; //opcode from cmd[15:14] 
  	logic [5:0] addr; //address from which to read 
 	logic [7:0] response;//used by FSM
-	logic [LOG2-1: 0] addr_ptr;//used inside FSM
  	 
  	assign data = cmd[7:0]; 
  	assign dmp_chnnl = cmd[10:8]; 
