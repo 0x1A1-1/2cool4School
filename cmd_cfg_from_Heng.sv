@@ -13,7 +13,6 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  	input [15:0] cmd; //16 bits cmd from UART.The upper 2-bits [15:14] encodes the opcode 
  	input cmd_rdy; //cmd is ready for use 
  	input resp_sent; // asserted when transmission of resp to host is finished 
- 	input rd_done; // asserted when last bite of sample data has been read 
  	input set_capture_done; // sets capture done bit 
  	input [7:0] rdataCH1, rdataCH2, rdataCH3, rdataCH4, rdataCH5;//Read Data From RAM 
  
@@ -35,7 +34,6 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  	output logic [7:0] resp; //data send to host as response 
  	output logic send_resp; //initiate transmission to host 
  	output logic clr_cmd_rdy; // used when processing finished 
- 	output logic strt_rd; //fire off a read of channel RAMs 
  
  
  	logic wrt_reg;//asserted when write reg happens 
@@ -263,7 +261,6 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  						 
  						DMP: begin //dump 
 							nxt_state = DUMP; 
- 							strt_rd = 1; 
  						end 
  						 
  						default: begin //reserved for future use 
@@ -295,6 +292,7 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  					default: response = rdataCH5;//default reading CH5 
  				endcase 
  				 
+ 				
  				if(rd_done) begin // when last bit is read, jump out of DUMP state 
  					clr_cmd_rdy = 1; 
 					nxt_state = IDLE; 
