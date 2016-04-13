@@ -1,7 +1,7 @@
 module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, rdataCH1,rdataCH2, rdataCH3, rdataCH4,
 		rdataCH5, ram_addr, TrigCfg, CH1TrigCfg, CH2TrigCfg, CH3TrigCfg, CH4TrigCfg, CH5TrigCfg, decimator, VIH,
 		VIL, matchH, matchL, maskH, maskL, baud_cntH, baud_cntL, trig_posH, trig_posL, resp, send_resp, clr_cmd_rdy,
-		strt_rd); //put list in here 
+		strt_rd, waddr); //put list in here 
  
 	parameter ENTRIES = 384, LOG2 = 9;	 
  	 
@@ -15,6 +15,7 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  	input resp_sent; // asserted when transmission of resp to host is finished 
  	input set_capture_done; // sets capture done bit 
  	input [7:0] rdataCH1, rdataCH2, rdataCH3, rdataCH4, rdataCH5;//Read Data From RAM 
+ 	input [7:0] waddr;// address from cntrl
  
  
  	//ram address is same across all 5 queues 
@@ -42,6 +43,7 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  	logic [1:0] op; //opcode from cmd[15:14] 
  	logic [5:0] addr; //address from which to read 
 	logic [7:0] response;//used by FSM
+	logic [LOG2-1: 0] addr_ptr;//used inside FSM
  	 
  	assign data = cmd[7:0]; 
  	assign dmp_chnnl = cmd[10:8]; 
@@ -218,7 +220,7 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  		nxt_state = IDLE; 
  		clr_cmd_rdy = 0; 
  		strt_rd = 0; 
- 		 
+
  		case(state) 
  			IDLE :  
  				//processing part 
@@ -260,6 +262,7 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  						end	 
  						 
  						DMP: begin //dump 
+ 							addr_ptr = waddr;
 							nxt_state = DUMP; 
  						end 
  						 
@@ -284,20 +287,19 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  			end 
  
  			DUMP: begin //dump state 
- 				case(dmp_chnnl) 
- 					3'b001: response = rdataCH1; 
- 					3'b010: response = rdataCH2; 
- 					3'b011: response = rdataCH3; 
- 					3'b100: response = rdataCH4; 
- 					default: response = rdataCH5;//default reading CH5 
- 				endcase 
- 				 
- 				
- 				if(rd_done) begin // when last bit is read, jump out of DUMP state 
+
+ 				if(addr_ptr = waddr-1) begin // when all data is read, jump out of DUMP state 
  					clr_cmd_rdy = 1; 
 					nxt_state = IDLE; 
  				end  
  				else begin 
+ 					case(dmp_chnnl) 
+ 						3'b001: response = rdataCH1; 
+ 						3'b010: response = rdataCH2; 
+ 						3'b011: response = rdataCH3; 
+ 						3'b100: response = rdataCH4; 
+ 						default: response = rdataCH5;//default reading CH5 
+ 					endcase 	
  					nxt_state = DUMPING; 
 					send_resp = 1; 
  				end 
@@ -308,8 +310,12 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  			//in the started of transmitting, but need to keep on this state 
  				if (resp_sent) begin 
  					nxt_state = DUMP; 
+ 					if(addr_ptr < ENTRIES)
+ 						addr_ptr = addr_ptr +1;
+ 					else 
+ 						addr_ptr = 0;
  				end else begin 
- 					nxt_state = DUMPING;//waiting and looping here until resp_sent finished 
+ 					nxt_state = DUMPING;//waiting and looping here until resp_sent finished 					
  				end 
  			end 
  			 
