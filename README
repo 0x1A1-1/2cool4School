@@ -16,5 +16,7 @@ TODO:
 DONE:
 [-]Q3 & PROOF 
 [-]channel trigger logic has been modifeid by Heng, should now works
+[-]there are two versions of capture_cntrl, one is simple version, named capture_ctrl, should covered what we need for HW5_2
+    , full verision is capture_cntrl_for_later_use, which should covered full functions for this unit
 
 
