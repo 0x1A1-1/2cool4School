@@ -52,10 +52,10 @@ logic wr_reg;
 //sure the cmd is not garbage
 
 //I lied i think we only want to update the command if we ideling
-assign command = (state == IDEL) ? cmd[15:14] : command;
-assign addr    = (state == IDEL) ? cmd[13: 8] : addr;
-assign channel = (state == IDEL) ? cmd[10: 8] : channel;
-assign data    = (state == IDEL) ? cmd[ 7: 0] : data;
+assign command = (state == IDLE) ? cmd[15:14] : command;
+assign addr    = (state == IDLE) ? cmd[13: 8] : addr;
+assign channel = (state == IDLE) ? cmd[10: 8] : channel;
+assign data    = (state == IDLE) ? cmd[ 7: 0] : data;
 
 //////////// Channel Trig Configuration //////////
 always_ff @(posedge clk, negedge rst_n) begin
