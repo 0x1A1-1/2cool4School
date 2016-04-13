@@ -12,7 +12,7 @@ module cmd_cfg(); //put list in here
 	input resp_sent; // asserted when transmission of resp to host is finished
 	input rd_done; // asserted when last bite of sample data has been read
 	input set_capture_done; // sets capture done bit
-	input [7:0] rdataCH1, rdataCH2, rdataCH3, rdataCH4, rdataCH5;
+	input [7:0] rdataCH1, rdataCH2, rdataCH3, rdataCH4, rdataCH5;//Read Data From RAM
 
 	//ram address is same across all 5 queues
 	//output from capture_cntrl block
