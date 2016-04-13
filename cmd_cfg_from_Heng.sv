@@ -55,10 +55,10 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  	always_ff @ (posedge clk, negedge rst_n) begin 
  		if (!rst_n) 
  			TrigCfg <= 6'h03; 
+ 		else if (set_capture_done)
+			TrigCfg[5] <= 1'b1;		
  		else if (wrt_reg && wrt_add == 6'h00) 
  			TrigCfg <= data[5:0]; 
-		else if (set_capture_done)
-			TrigCfg[5] <= 1'b1;
  	end 
 
 	
