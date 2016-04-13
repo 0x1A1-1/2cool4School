@@ -1,4 +1,5 @@
-module capture_cntrl(clk, rst_n, wrt_smpl, we, waddr, trig_posH, trig_posL, run, triggered, capture_done, armed, set_capture_done);
+module capture_cntrl(clk, rst_n, wrt_smpl, we, waddr, trig_posH, trig_posL, run, triggered, 
+			capture_done, armed, set_capture_done);
 
 	parameter ENTRIES = 384, LOG2 = 9;	
 
