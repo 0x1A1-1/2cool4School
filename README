@@ -10,6 +10,7 @@ TODO:
 [] implement state machine logic in cmd_cfg
 [] match and mask checking should be        mask & (match ^ data) == (match ^ data)       in UART_RX_trig
 [] implement dumping logic in cmd_cfg. We have modified Heng's version and is the one we will be working with
+[] channel_trigger_logic should be "negedge set_armed"
 
 DONE:
 [-]Q3 & PROOF 
