@@ -244,7 +244,7 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 			start_addr <= 0;
 		else if(start_dump)
 			//we want to start reading from the NEXT addr
-			start_addr <= (ram_addr == ENTRIES - 1) ? 0 : ram_addr + 1;
+			start_addr <= ram_addr;
 	end
 
 	//ram_addr ff - this is the working value that is output and address that is read from each RAM module
