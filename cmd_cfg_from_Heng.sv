@@ -288,7 +288,7 @@ module cmd_cfg(clk, rst_n, cmd, cmd_rdy, resp_sent, rd_done, set_capture_done, r
  
  			DUMP: begin //dump state 
 
- 				if(addr_ptr = waddr-1) begin // when all data is read, jump out of DUMP state 
+ 				if(addr_ptr == waddr-1) begin // when all data is read, jump out of DUMP state 
  					clr_cmd_rdy = 1; 
 					nxt_state = IDLE; 
  				end  
