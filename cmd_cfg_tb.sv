@@ -8,7 +8,7 @@ logic clk, rst_n;
 logic cmd_rdy; //cmd is ready for use 
 logic resp_sent; // asserted when transmission of resp to host is finished 
 logic set_capture_done; // sets capture done bit 
-logic [7:0] waddr_ctr;// address from cntrl
+logic [LOG2 -1:0] ram_addr;// address from cntrl
 logic [7:0] rdata; //data from the ram queue
 
 //logic for cmd_cfg outputs
@@ -31,17 +31,17 @@ logic [LOG2-1: 0] addr_ptr;//used inside FSM, and also for as output raddr for R
 //logic for Ram Queue We are only going to test with 1 Ram Queue
 logic we;
 logic [7:0] wdata;
-logic [log2 -1:0] waddr, raddr;
+logic [LOG2 -1:0] waddr, raddr;
 			
 //Testing Logic
 logic [7:0] test_response;
 			
 //All five channels are hooked up to one ram queue
-cmd_cfg iCMD(.clk(clk), .rst_n(rst_n), .cmd(cmd), .cmd_rdy(cmd_rdy), .resp_sent(resp_sent), .set_capture_done(set_capture_done), 
-			.rdataCH1(rdata), .rdataCH2(rdata), .rdataCH3(rdata), .rdataCH4(rdata), .rdataCH5(rdata), .ram_addr(ram_addr), 
-			.TrigCfg(TrigCfg), .CH1TrigCfg(CH1TrigCfg), .CH2TrigCfg(CH2TrigCfg), .CH3TrigCfg(CH3TrigCfg), .CH4TrigCfg(CH4TrigCfg), .CH5TrigCfg(CH5TrigCfg), 
-			.decimator(decimator), .VIH(VIH), .VIL(VIL), .maskH(maskH), .maskL(maskL), .baud_cntH(baud_cntH), .baud_cntL(baud_cntL),.trig_posH(trig_posH), 
-			.trig_posL(trig_posL), .resp(resp), .send_resp(send_resp), .clr_cmd_rdy(clr_cmd_rdy), .waddr(waddr_ctr), .addr_ptr(addr_ptr));
+cmd_cfg iCMD(.clk(clk), .rst_n(rst_n), .cmd(cmd), .cmd_rdy(cmd_rdy), .resp_sent(), .set_capture_done(set_capture_done), 
+			.rdataCH1(rdata), .rdataCH2(rdata), .rdataCH3(rdata), .rdataCH4(rdata), .rdataCH5(rdata), .ram_addr(raddr), 
+			.TrigCfg(), .CH1TrigCfg(), .CH2TrigCfg(), .CH3TrigCfg(), .CH4TrigCfg(), .CH5TrigCfg(), 
+			.decimator(), .VIH(), .VIL(), .maskH(), .maskL(), .baud_cntH(), .baud_cntL(),.trig_posH(), 
+			.trig_posL(), .resp(resp), .send_resp(), .clr_cmd_rdy(clr_cmd_rdy), .ram_addr(ram_addr), .addr_ptr());
 			
 
 RAMqueue iRAM(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(raddr), .rdata(rdata));
@@ -64,35 +64,35 @@ waddr_ctr = 8'h00;
 waddr = 0;
 wdata = 8'h00;
 
-repeat (2) @(posedge clk)
+repeat (2) @(posedge clk);
 //write some data to ram queue
 we = 1;
 for(i = 0; i < 384; i = i + 1)begin
 	waddr = waddr + 1;
 	wdata = wdata + 1;
-	repeat (1) @(posedge clk)
+	repeat (1) @(posedge clk);
 end
 we = 0;
 
 //write to a reg MaskH 0x4B55
 cmd = 16'b0100101101010101;
-repeat (2) @(posedge clk)
+repeat (2) @(posedge clk);
 cmd_rdy = 1;
 //wait for the all clear
 while(!clr_cmd_rdy)
-	repeat (1) @(posedge clk)
+	repeat (1) @(posedge clk);
 	
 	
 //read reg MaskH
 //cmd = 16'h0B55;
 cmd = 16'b0000101101010101;
-repeat (2) @(posedge clk)
+repeat (2) @(posedge clk);
 cmd_rdy = 1;	
 
 while(!clr_cmd_rdy)
-	repeat (1) @(posedge clk)	
+	repeat (1) @(posedge clk);	
 
-if(resp = 8'h55)
+if(resp == 8'h55)
 	$display("write and read worked worked!");
 
 //dump channel 1
@@ -102,7 +102,7 @@ repeat (2) @(posedge clk)
 cmd_rdy = 1;
 
 while(!clr_cmd_rdy)
-	repeat (1) @(posedge clk)
+	repeat (1) @(posedge clk);
 
 	
 $display("cmd_cfg is functional :)");
