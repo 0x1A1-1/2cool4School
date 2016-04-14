@@ -1,7 +1,6 @@
 module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 				rdataCH1, rdataCH2, rdataCH3, rdataCH4, rdataCH5,
-				raddrCH1, raddrCH2, raddrCH3, raddrCH4, raddrCH5,
-				ram_addr, decimator,
+				addr_ptr, ram_addr, decimator,
 				TrigCfg, CH1TrigCfg, CH2TrigCfg, CH3TrigCfg, CH4TrigCfg, CH5TrigCfg,
 				VIH, VIL, matchH, matchL, maskH, maskL, baud_cntH, baud_cntL,
 				trig_posH, trig_posL,
@@ -32,7 +31,11 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 	//        INPUTS FROM CAPTURE CTRL       //
 	///////////////////////////////////////////
 	input logic [LOG2-1:0] ram_addr; 
-	logic [LOG2-1:0] ram_addr_ff;
+	
+	///////////////////////////////////////////
+	//            RAM READ ADDRESS           //
+	///////////////////////////////////////////
+	output logic [LOG2-1:0] addr_ptr;
 
 	///////////////////////////////////////////
 	//        CONFIGURATION REGISTERS        //
@@ -45,11 +48,6 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 	output logic [7:0] maskH, maskL;
 	output logic [7:0] baud_cntH, baud_cntL;
 	output logic [LOG2-1:0] trig_posH, trig_posL;
-
-	///////////////////////////////////////////
-	//           RAM READ ADDRESSES          //
-	///////////////////////////////////////////
-	output logic [LOG2-1:0] raddrCH1, raddrCH2, raddrCH3, raddrCH4, raddrCH5;
 	
 	///////////////////////////////////////////
 	//            OUTPUTS TO UART            //
@@ -243,33 +241,28 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 		if(!rst_n)
 			start_addr <= 0;
 		else if(start_dump)
-			//we want to start reading from the NEXT addr
+			//we are done when we reach this address
 			start_addr <= ram_addr;
 	end
 
 	//ram_addr ff - this is the working value that is output and address that is read from each RAM module
 	always_ff @(posedge clk, negedge rst_n) begin
 		if(!rst_n) 
-			ram_addr_ff <= 0;
+			addr_ptr <= 0;
 		else if(start_dump) 
 			//start from the NEXT address. wrap if needed.
-			ram_addr_ff <= (ram_addr == ENTRIES - 1) ? 0 : ram_addr + 1;
+			addr_ptr <= (ram_addr == ENTRIES - 1) ? 0 : ram_addr + 1;
 		else if(inc_addr) 
 			//increment the addr the RAM is being read from. wrap if needed.
-			ram_addr_ff <= (ram_addr_ff == ENTRIES - 1) ? 0 : ram_addr_ff + 1; 
+			addr_ptr <= (addr_ptr == ENTRIES - 1) ? 0 : addr_ptr + 1; 
 	end
-	
-	//each RAM module is being read from the same address
-	assign raddrCH1 = ram_addr_ff;
-	assign raddrCH2 = ram_addr_ff;	
-	assign raddrCH3 = ram_addr_ff;
-	assign raddrCH4 = ram_addr_ff;
-	assign raddrCH5 = ram_addr_ff;
 
-	//if the ram_addr_ff value reaches back around to where it started then we are done
-	assign rd_done = (ram_addr_ff == start_addr) ? 1 : 0;
+	//if the addr_ptr value reaches back around to where it started then we are done
+	assign rd_done = (addr_ptr == start_addr) ? 1 : 0;
 			
-	//main FSM
+	///////////////////////////////////////////
+	//               MAIN FSM                //
+	///////////////////////////////////////////
 	//TODO: fix number of bits used when states finalized
 	typedef enum reg [1:0] {IDLE, RESPOND, DUMP, DUMPING} state_t;
 	state_t state, nxt_state;
