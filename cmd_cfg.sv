@@ -229,12 +229,16 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 	///////////////////////////////////////////
 
 	//resp ff
+	/*
 	always_ff @(posedge clk, negedge rst_n) begin
 		if(!rst_n) 
 			resp <= 8'h00;
 		else 
 			resp <= response;
 	end
+	//*/
+
+	assign resp = response;
 
 	//start_addr ff
 	always_ff @(posedge clk, negedge rst_n) begin

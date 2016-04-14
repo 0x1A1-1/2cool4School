@@ -41,14 +41,17 @@ module cmd_cfg_tb();
 	//UART and cmonmaster
 	logic RX_TX, TX_RX;
 	logic [15:0] result;
+
+	logic [7:0] RAM[3:0];
+	integer i;
 				
 	//All five channels are hooked up to one ram queue
 	cmd_cfg iCMD(.clk(clk), .rst_n(rst_n), .cmd(cmd), .cmd_rdy(cmd_rdy), .resp_sent(resp_sent), .set_capture_done(set_capture_done), 
-				.rdataCH1(rdataCH1), .rdataCH2(rdataCH2), .rdataCH3(rdataCH3), .rdataCH4(rdataCH4), .rdataCH5(rdataCH5), 
+				.rdataCH1(RAM[i]), .rdataCH2(rdataCH2), .rdataCH3(rdataCH3), .rdataCH4(rdataCH4), .rdataCH5(rdataCH5), 
 				.TrigCfg(TrigCfg), .CH1TrigCfg(CH1TrigCfg), .CH2TrigCfg(CH2TrigCfg), .CH3TrigCfg(CH3TrigCfg), .CH4TrigCfg(CH4TrigCfg),
 				.CH5TrigCfg(CH5TrigCfg), .decimator(decimator), .VIH(VIH), .VIL(VIL), .maskH(maskH), .maskL(maskL), .matchH(matchH), .matchL(matchL),
 				.baud_cntH(baud_cntH), .baud_cntL(baud_cntL), .trig_posH(trig_posH), .trig_posL(trig_posL),
-				.response(response), .send_resp(send_resp), .clr_cmd_rdy(clr_cmd_rdy), .ram_addr(ram_addr), .addr_ptr(addr_ptr));
+				.resp(response), .send_resp(send_resp), .clr_cmd_rdy(clr_cmd_rdy), .ram_addr(ram_addr), .addr_ptr(addr_ptr));
 				
 	RAMqueue iRAM1(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH1));
 	RAMqueue iRAM2(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH2));
@@ -62,44 +65,79 @@ module cmd_cfg_tb();
 						.RX(TX_RX), .TX(RX_TX), .resp_sent(resp_sent), .cmd_rdy(cmd_rdy), .cmd(cmd));
 	//CommMaster 
 	CommMaster CMD_MST(.clk(clk), .rst_n(rst_n), .cmd(mst_cmd), .snd_cmd(snd_cmd), .TX(TX_RX), .cmd_cmplt(), .RX(RX_TX), 
-						.rdy(), .rx_data(result), .clr_rdy());
+						.rdy(), .rx_data(), .clr_rdy());
 	
-	//generate clk
-	initial begin
-		clk = 0;
-		forever #10 clk = ~clk;
-	end
 	
 	//manipulating input cmd and look on output resp
 	initial begin
-		rst_n = 1;
-		snd_cmd = 16'b0000_0000_0000_0000;
-		resp_sent = 1'b0;
-		set_capture_done = 1'b0;
-		ram_addr = 0;
-		
-		repeat (2) @(posedge clk); //testing rst_n
+		clk = 0;
 		rst_n = 0;
-		repeat (2) @(posedge clk);
-		rst_n = 1;
+		i = 0; 
+		@(posedge clk); @(negedge clk); rst_n = 1;
+		@(posedge clk);
+
+		//cmd = WRITE maskH with AF and wait for pos ack
+		mst_cmd = 16'b01_001011_10101111; //4BAF
+		snd_cmd = 1; @(posedge clk); snd_cmd = 0;
+
+		@(posedge send_resp);
+		if(response == 8'hA5) $display("Got the correct response!");
+		else $display("Didn't get ack from cmd_cfg"); //ERROR
+
+		repeat(1000) @(posedge clk);
 		
-		repeat (2) @(posedge clk);
-		cmd = 16'b01_001011_0000_1111; // writing 0000_1111 to maskH
-		
-		
-		repeat (10) @(posedge clk);
-		$finish;
+		//cmd = READ maskH
+		mst_cmd = 16'b00_001011_00000000;
+		snd_cmd = 1; @(posedge clk); snd_cmd = 0;
+
+		@(posedge send_resp);
+		if(response == 8'hAF) $display("Got the correct response!");
+		else $display("Didn't get correct value from maskH register"); //ERROR
 	
+		repeat(1000) @(posedge clk);
+
+		//cmd = DUMP channel 1 (only RAM we have in this tb)
+		mst_cmd = 16'b10_000001_00000000;
+		snd_cmd = 1; @(posedge clk); snd_cmd = 0;
+		
+		@(posedge send_resp);
+		if(response == RAM[i]) begin $display("Got correct response from dump: %h", RAM[i]); $stop; end
+		i = i + 1;
+		resp_sent = 1; @(posedge clk); resp_sent = 0;
+
+		@(posedge send_resp);
+		if(response == RAM[i]) $display("Got correct response from dump");
+		i = i + 1;
+		resp_sent = 1; @(posedge clk); resp_sent = 0;
+
+		@(posedge send_resp);
+		if(response == RAM[i]) $display("Got correct response from dump");
+		i = i + 1;
+		resp_sent = 1; @(posedge clk); resp_sent = 0;
+
+		@(posedge send_resp);
+		if(response == RAM[i]) $display("Got correct response from dump");
+		resp_sent = 1; @(posedge clk); resp_sent = 0;
+
+		repeat(100) @(posedge clk);
+		$stop;
 	end
 	
+	always #1 clk = ~clk;
 	
+	initial begin
+		RAM[0] = 8'h33;
+		RAM[1] = 8'h44;
+		RAM[2] = 8'h55;
+		RAM[3] = 8'h66;
+	end
+
 	/***************************
 	logic [8:0] i;
 	//we still need a RAMqueue interface...Pontentially in capture?
 	initial begin 
 		$monitor("response: %b", resp);
 	end
-
 	initial begin 
 	clk = 0;
 	we = 0;
@@ -110,7 +148,6 @@ module cmd_cfg_tb();
 	waddr_ctr = 8'h00;
 	waddr = 0;
 	wdata = 8'h00;
-
 	repeat (2) @(posedge clk);
 	//write some data to ram queue
 	we = 1;
@@ -120,7 +157,6 @@ module cmd_cfg_tb();
 		repeat (1) @(posedge clk);
 	end
 	we = 0;
-
 	//write to a reg MaskH 0x4B55
 	cmd = 16'b0100101101010101;
 	repeat (2) @(posedge clk);
@@ -135,33 +171,24 @@ module cmd_cfg_tb();
 	cmd = 16'b0000101101010101;
 	repeat (2) @(posedge clk);
 	cmd_rdy = 1;	
-
 	while(!clr_cmd_rdy)
 		repeat (1) @(posedge clk);	
-
 	if(resp == 8'h55)
 		$display("write and read worked worked!");
-
 	//dump channel 1
 	//cmd = 16'h8100;
 	cmd = 16'b1000000100000000;
 	repeat (2) @(posedge clk)
 	cmd_rdy = 1;
-
 	while(!clr_cmd_rdy)
 		repeat (1) @(posedge clk);
-
 		
 	$display("cmd_cfg is functional :)");
 	$stop(); //passed
-
 	end
-
 	//forces cmd_rdy to 0 when clr_cmd_rdy is asserted
 	always @(posedge clr_cmd_rdy) cmd_rdy = 0;
-
 	always #5 clk = ~clk;
-
 	//timeout
 	initial begin
 		repeat(500000) @(posedge clk);
