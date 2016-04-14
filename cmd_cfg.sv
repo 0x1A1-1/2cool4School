@@ -318,8 +318,8 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 								default: response = 8'hEE;
 							endcase
 							//TODO: do we need to wait here for the UART to be done sending?		
-							nxt_state = IDLE;	
-							clr_cmd_rdy = 1;
+							nxt_state = RESPOND;	
+							//clr_cmd_rdy = 1;
 							send_resp = 1;
 						end
 						
@@ -331,7 +331,7 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 							end
 							else begin
 								response = 8'hEE;
-								nxt_state = IDLE;
+								nxt_state = RESPOND;
 							end
 							send_resp = 1;
 						end	
@@ -412,5 +412,3 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 		endcase
 	end
 endmodule
-
-
