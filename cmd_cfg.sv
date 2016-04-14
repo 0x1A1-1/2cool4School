@@ -40,7 +40,7 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 	///////////////////////////////////////////
 	//        CONFIGURATION REGISTERS        //
 	///////////////////////////////////////////
-	output logic [4:0] TrigCfg; //trig config only has 5 used bits not 6
+	output logic [5:0] TrigCfg;
 	output logic [4:0] CH1TrigCfg, CH2TrigCfg, CH3TrigCfg, CH4TrigCfg, CH5TrigCfg;
 	output logic [3:0] decimator;
 	output logic [7:0] VIH, VIL;
