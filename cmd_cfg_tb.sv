@@ -50,6 +50,10 @@ RAMqueue iRAM(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(raddr), .
 logic [8:0] i;
 //we still need a RAMqueue interface...Pontentially in capture?
 initial begin 
+	$monitor("response: %b", resp);
+end
+
+initial begin 
 clk = 0;
 we = 0;
 cmd_rdy = 0;
@@ -70,38 +74,51 @@ for(i = 0; i < 384; i = i + 1)begin
 end
 we = 0;
 
-//write to a reg MaskH
-cmd = 16'h4B55;
+//write to a reg MaskH 0x4B55
+cmd = 16'b0100101101010101;
 repeat (2) @(posedge clk)
 cmd_rdy = 1;
 //wait for the all clear
-while(!clr_cmd_rdy) begin 
-	if(clr_cmd_rdy) 
-	  cmd_rdy = 0;
+while(!clr_cmd_rdy)
 	repeat (1) @(posedge clk)
-	end
 	
-cmd_rdy = 0; //just to double check it goes low
 	
 //read reg MaskH
-cmd = 16'h0B55;
+//cmd = 16'h0B55;
+cmd = 16'b0000101101010101;
 repeat (2) @(posedge clk)
 cmd_rdy = 1;	
 
-while(!clr_cmd_rdy) begin 
-	if(clr_cmd_rdy) 
-	  cmd_rdy = 0;
-	repeat (1) @(posedge clk)
-	end
-	
-if(resp = 8'h55)
-	$display("write and read worked worked!")
+while(!clr_cmd_rdy)
+	repeat (1) @(posedge clk)	
 
-//dump part
+if(resp = 8'h55)
+	$display("write and read worked worked!");
+
+//dump channel 1
+//cmd = 16'h8100;
+cmd = 16'b1000000100000000;
+repeat (2) @(posedge clk)
+cmd_rdy = 1;
+
+while(!clr_cmd_rdy)
+	repeat (1) @(posedge clk)
+
 	
+$display("cmd_cfg is functional :)");
+$stop(); //passed
 
 end
 
+//forces cmd_rdy to 0 when clr_cmd_rdy is asserted
+always @(posedge clr_cmd_rdy) cmd_rdy = 0;
+
 always #5 clk = ~clk;
+
+//timeout
+initial begin
+	repeat(500000) @(posedge clk);
+	$stop(); //Boo
+end
 			
 endmodule
