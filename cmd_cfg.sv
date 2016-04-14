@@ -262,13 +262,13 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 	end
 
 	//if the addr_ptr value reaches back around to where it started then we are done
-	assign rd_done = (addr_ptr == start_addr) ? 1 : 0;
+	assign rd_done = ((addr_ptr == start_addr) && resp_sent);
 			
 	///////////////////////////////////////////
 	//               MAIN FSM                //
 	///////////////////////////////////////////
 	//TODO: fix number of bits used when states finalized
-	typedef enum reg [1:0] {IDLE, RESPOND, DUMP, DUMPING} state_t;
+	typedef enum reg [2:0] {IDLE, RESPOND, DUMP, DUMPING, LAST_DUMP} state_t;
 	state_t state, nxt_state;
 	
 	//state ff
@@ -297,7 +297,8 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 					case(op)
 					
 						RD: begin //read 
-							case(addr)								
+							case(addr)	
+								6'h00: response = {2'b00, TrigCfg};							
 								6'h01: response = {3'b000, CH1TrigCfg};
 								6'h02: response = {3'b000, CH2TrigCfg};
 								6'h03: response = {3'b000, CH3TrigCfg};
@@ -314,7 +315,7 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 								6'h0E: response = baud_cntL;
 								6'h0F: response = trig_posH; 
 								6'h10: response = trig_posL;
-								default: response = {2'b00, TrigCfg};
+								default: response = 8'hEE;
 							endcase
 							//TODO: do we need to wait here for the UART to be done sending?		
 							nxt_state = IDLE;	
@@ -324,9 +325,15 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 						
 						WR: begin //write
 							wrt_reg = 1;
-							response = 8'hA5; //TODO: may need to send ack one clock period later
+							if(addr <= 6'h10) begin
+								response = 8'hA5; 
+								nxt_state = RESPOND;
+							end
+							else begin
+								response = 8'hEE;
+								nxt_state = IDLE;
+							end
 							send_resp = 1;
-							nxt_state = RESPOND;
 						end	
 						
 						DMP: begin //dump
@@ -364,15 +371,15 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 					3'b100: response = rdataCH4;
 					default: response = rdataCH5;	//default reading CH5
 				endcase
+
+				inc_addr = 1;
+				send_resp = 1;
 				
 				if(rd_done) begin //when last bit is read, jump out of DUMP state
-					clr_cmd_rdy = 1;
-					nxt_state = IDLE;
+					nxt_state = LAST_DUMP;
 				end 
 				else begin
-					nxt_state = DUMPING;
-					inc_addr = 1;
-					send_resp = 1;
+					nxt_state = DUMPING;				
 				end
 			end
 			
@@ -385,6 +392,15 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 				else begin
 					nxt_state = DUMPING;//waiting and looping here until resp_sent finished
 				end
+			end
+
+			LAST_DUMP: begin
+				if(resp_sent) begin
+					clr_cmd_rdy = 1;
+					nxt_state = IDLE;
+				end
+				else
+					nxt_state = LAST_DUMP;
 			end
 			
 			default: begin //when none, send back neg ack 0XEE
