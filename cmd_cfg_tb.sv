@@ -43,21 +43,25 @@ module cmd_cfg_tb();
 	logic [15:0] result;
 
 	logic [7:0] RAM[3:0];
-	integer i;
+	integer i, j;
+
+	logic [7:0] expected;
 				
 	//All five channels are hooked up to one ram queue
 	cmd_cfg iCMD(.clk(clk), .rst_n(rst_n), .cmd(cmd), .cmd_rdy(cmd_rdy), .resp_sent(resp_sent), .set_capture_done(set_capture_done), 
-				.rdataCH1(RAM[i]), .rdataCH2(rdataCH2), .rdataCH3(rdataCH3), .rdataCH4(rdataCH4), .rdataCH5(rdataCH5), 
+				.rdataCH1(rdataCH1), .rdataCH2(rdataCH2), .rdataCH3(rdataCH3), .rdataCH4(rdataCH4), .rdataCH5(rdataCH5), 
 				.TrigCfg(TrigCfg), .CH1TrigCfg(CH1TrigCfg), .CH2TrigCfg(CH2TrigCfg), .CH3TrigCfg(CH3TrigCfg), .CH4TrigCfg(CH4TrigCfg),
 				.CH5TrigCfg(CH5TrigCfg), .decimator(decimator), .VIH(VIH), .VIL(VIL), .maskH(maskH), .maskL(maskL), .matchH(matchH), .matchL(matchL),
 				.baud_cntH(baud_cntH), .baud_cntL(baud_cntL), .trig_posH(trig_posH), .trig_posL(trig_posL),
 				.resp(response), .send_resp(send_resp), .clr_cmd_rdy(clr_cmd_rdy), .ram_addr(ram_addr), .addr_ptr(addr_ptr));
+	//defparam iCMD.ENTRIES = 4;
+	//defparam iCMD.LOG2 = 2;
 				
 	RAMqueue iRAM1(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH1));
-	RAMqueue iRAM2(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH2));
-	RAMqueue iRAM3(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH3));
-	RAMqueue iRAM4(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH4));
-	RAMqueue iRAM5(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH5));
+	//RAMqueue iRAM2(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH2));
+	//RAMqueue iRAM3(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH3));
+	//RAMqueue iRAM4(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH4));
+	//RAMqueue iRAM5(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH5));
 	
 
 	//UART_Wrapper
@@ -98,38 +102,44 @@ module cmd_cfg_tb();
 
 		//cmd = DUMP channel 1 (only RAM we have in this tb)
 		mst_cmd = 16'b10_000001_00000000;
+		ram_addr = 0;
 		snd_cmd = 1; @(posedge clk); snd_cmd = 0;
-		
-		@(posedge send_resp);
-		if(response == RAM[i]) begin $display("Got correct response from dump: %h", RAM[i]); $stop; end
-		i = i + 1;
-		resp_sent = 1; @(posedge clk); resp_sent = 0;
 
-		@(posedge send_resp);
-		if(response == RAM[i]) $display("Got correct response from dump");
-		i = i + 1;
-		resp_sent = 1; @(posedge clk); resp_sent = 0;
 
-		@(posedge send_resp);
-		if(response == RAM[i]) $display("Got correct response from dump");
-		i = i + 1;
-		resp_sent = 1; @(posedge clk); resp_sent = 0;
+		for(j = 0; j < 384; j = j + 1) begin
+			//if(j < 383)
+			@(posedge send_resp);
+			expected = j+1 % 384;
+			if(response != expected) $stop;
+			else if(clr_cmd_rdy) $stop;
+			resp_sent = 1; @(posedge clk); resp_sent = 0;
+		end
 
-		@(posedge send_resp);
-		if(response == RAM[i]) $display("Got correct response from dump");
-		resp_sent = 1; @(posedge clk); resp_sent = 0;
-
-		repeat(100) @(posedge clk);
+		@(posedge clr_cmd_rdy);
 		$stop;
+
+		
 	end
 	
 	always #1 clk = ~clk;
 	
 	initial begin
-		RAM[0] = 8'h33;
-		RAM[1] = 8'h44;
-		RAM[2] = 8'h55;
-		RAM[3] = 8'h66;
+		waddr = 0;
+		wdata = 8'h00;
+		repeat (2) @(posedge clk);
+		//write some data to ram queue
+		we = 1;
+		for(i = 0; i < 384; i = i + 1)begin
+			waddr = waddr + 1;
+			wdata = wdata + 1 % 384;
+			repeat (1) @(posedge clk);
+		end
+		we = 0;
+	end
+
+	initial begin
+		repeat(5000000) @(posedge clk);
+		$stop(); //Boo
 	end
 
 	/***************************
