@@ -72,10 +72,13 @@ module cmd_cfg_tb();
 	
 	//manipulating input cmd and look on output resp
 	always #1 clk=~clk;
+	
+	//time out setting
 	initial begin
 		repeat(5000000) @(posedge clk);
 		$stop(); //Boo
 	end 
+	
 	initial begin
 		rst_n = 0;
 		clk = 0;
@@ -86,96 +89,38 @@ module cmd_cfg_tb();
 		mst_cmd = 16'b01_001011_10101111;
 		snd_cmd = 1;@(posedge clk); snd_cmd = 0;
 		@(posedge result_rdy); 
-		
-		$display("%h", result); 
-		$stop;
+		if(result == 8'hA5) $display("Got the correct response!");
+		else $display("Didn't get ack from cmd_cfg"); 
 		
 		clr_rdy = 1; @(posedge clk); clr_rdy = 0;
 		
-		
 		repeat (100) @(posedge clk);
+		
+		// read maskH from the RAM
 		mst_cmd = 16'b00_001011_00000000;
 		snd_cmd = 1;@(posedge clk); snd_cmd = 0;
 		
-		@(posedge send_resp); 		
-		$display("%h", response); $stop;
-		
-		
-		repeat (10) @(posedge clk);
-		/*clk = 0;
-		rst_n = 0;
-		i = 0; 
-		@(posedge clk); @(negedge clk); rst_n = 1;
-		@(posedge clk);
-
-		//cmd = WRITE maskH with AF and wait for pos ack
-		mst_cmd = 16'b01_001011_10101111; //4BAF
-		snd_cmd = 1; @(posedge clk); snd_cmd = 0;
-
-		@(posedge resp_sent);
-		if(response == 8'hA5) $display("Got the correct response!");
-		else $display("Didn't get ack from cmd_cfg"); //ERROR
-
-		repeat(1000) @(posedge clk);
-		
-		//cmd = READ maskH
-		mst_cmd = 16'b00_001011_00000000;
-		snd_cmd = 1; @(posedge clk); snd_cmd = 0;
-
-		@(posedge send_resp);
-		if(response == 8'hAF) $display("Got the correct response!");
+		@(posedge result_rdy); 		
+		if(result == 8'hAF) $display("Got the correct response!");
 		else $display("Didn't get correct value from maskH register"); //ERROR
-	
-		repeat(1000) @(posedge clk);
-
-		//cmd = DUMP channel 1 (only RAM we have in this tb)
+		
+		// DUMP Checking
 		mst_cmd = 16'b10_000001_00000000;
 		ram_addr = 0;
 		snd_cmd = 1; @(posedge clk); snd_cmd = 0;
-
-
 		for(j = 0; j < 384; j = j + 1) begin
 			//if(j < 383)
-			@(posedge send_resp);
+			@(posedge result_rdy);
 			expected = j+1 % 384;
-			if(response != expected) $stop;
+			if(result != expected) $display("Got the wrong response!"); 
 			else if(clr_cmd_rdy) $stop;
 		end
 
 		@(posedge clr_cmd_rdy);
 		$stop;
-
 		
+		repeat (10) @(posedge clk);
 	end
-	
-	always #1 clk = ~clk;
-	
-	initial begin
-		waddr = 0;
-		wdata = 8'h00;
-		repeat (2) @(posedge clk);
-		//write some data to ram queue
-		we = 1;
-		for(i = 0; i < 384; i = i + 1)begin
-			waddr = waddr + 1;
-			wdata = wdata + 1 % 384;
-			repeat (1) @(posedge clk);
-		end
-		we = 0;
-	end
-
-	initial begin
-		repeat(5000000) @(posedge clk);
-		$stop(); //Boo
-		*/
-	end
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	/***************************
@@ -240,5 +185,5 @@ module cmd_cfg_tb();
 		repeat(500000) @(posedge clk);
 		$stop(); //Boo
 	end
-	******************************/			
+	******************************/	
 endmodule
