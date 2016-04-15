@@ -34,18 +34,18 @@ module cmd_cfg_tb();
 	logic we;
 	logic [7:0] wdata;
 	logic [LOG2 -1:0] waddr;
-				
-	//Testing Logic
-	logic [7:0] test_response;
 	
 	//UART and cmonmaster
 	logic RX_TX, TX_RX;
 	logic [7:0] result;
-
-	logic [7:0] RAM[3:0];
+	
+	//interger for looping
 	integer i, j;
 
+	//expected value from dump
 	logic [7:0] expected;
+	
+	//clear signal after testing
 	reg clr_rdy ;			
 				
 	//All five channels are hooked up to one ram queue
@@ -55,12 +55,13 @@ module cmd_cfg_tb();
 				.CH5TrigCfg(CH5TrigCfg), .decimator(decimator), .VIH(VIH), .VIL(VIL), .maskH(maskH), .maskL(maskL), .matchH(matchH), .matchL(matchL),
 				.baud_cntH(baud_cntH), .baud_cntL(baud_cntL), .trig_posH(trig_posH), .trig_posL(trig_posL),
 				.resp(response), .send_resp(send_resp), .clr_cmd_rdy(clr_cmd_rdy), .ram_addr(ram_addr), .addr_ptr(addr_ptr));
-				
+	
+	//instantiate all 5 RAM block
 	RAMqueue iRAM1(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH1));
-	//RAMqueue iRAM2(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH2));
-	//RAMqueue iRAM3(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH3));
-	//RAMqueue iRAM4(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH4));
-	//RAMqueue iRAM5(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH5));
+	RAMqueue iRAM2(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH2));
+	RAMqueue iRAM3(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH3));
+	RAMqueue iRAM4(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH4));
+	RAMqueue iRAM5(.clk(clk), .we(we), .waddr(waddr), .wdata(wdata), .raddr(addr_ptr), .rdata(rdataCH5));
 	
 
 	//UART_Wrapper
@@ -76,7 +77,7 @@ module cmd_cfg_tb();
 	//time out setting
 	initial begin
 		repeat(5000000) @(posedge clk);
-		$stop(); //Boo
+		$stop(); 
 	end 
 	
 	initial begin
@@ -89,101 +90,74 @@ module cmd_cfg_tb();
 		mst_cmd = 16'b01_001011_10101111;
 		snd_cmd = 1;@(posedge clk); snd_cmd = 0;
 		@(posedge result_rdy); 
-		if(result == 8'hA5) $display("Got the correct response!");
+		if(result == 8'hA5) $display("Got the correct response for write!");
 		else $display("Didn't get ack from cmd_cfg"); 
-		
 		clr_rdy = 1; @(posedge clk); clr_rdy = 0;
 		
-		repeat (100) @(posedge clk);
+		// write to wrong address
+		mst_cmd = 16'b01_101011_10101111;
+		snd_cmd = 1;@(posedge clk); snd_cmd = 0;
+		@(posedge result_rdy); 
+		if(result == 8'hEE) $display("Got the correct response for wrong write!");
+		else $display("No you are supposed to give me error"); 
+		clr_rdy = 1; @(posedge clk); clr_rdy = 0;
 		
 		// read maskH from the RAM
 		mst_cmd = 16'b00_001011_00000000;
 		snd_cmd = 1;@(posedge clk); snd_cmd = 0;
 		
 		@(posedge result_rdy); 		
-		if(result == 8'hAF) $display("Got the correct response!");
+		if(result == 8'hAF) $display("Got the correct date from READ!");
 		else $display("Didn't get correct value from maskH register"); //ERROR
+		clr_rdy = 1; @(posedge clk); clr_rdy = 0;
+		
+		// read wrong address from the RAM
+		mst_cmd = 16'b00_101100_00000000;
+		snd_cmd = 1;@(posedge clk); snd_cmd = 0;
+		
+		@(posedge result_rdy); 		
+		if(result == 8'hEE) $display("Got the correct response for wrong read!");
+		else $display("No you are supposed to give me error"); //ERROR
+		clr_rdy = 1; @(posedge clk); clr_rdy = 0;
+		
 		
 		// DUMP Checking
 		mst_cmd = 16'b10_000001_00000000;
 		ram_addr = 0;
 		snd_cmd = 1; @(posedge clk); snd_cmd = 0;
 		for(j = 0; j < 384; j = j + 1) begin
-			//if(j < 383)
+			//checking dump of every address
 			@(posedge result_rdy);
 			expected = j+1 % 384;
-			if(result != expected) $display("Got the wrong response!"); 
-			else if(clr_cmd_rdy) $stop;
+			//display error message
+			if(result != expected) begin
+				$display("Got the wrong response!"); 
+				$stop;
+			end
 		end
-
-		@(posedge clr_cmd_rdy);
-		$stop;
+		//Display test passed message
+		@(posedge clr_cmd_rdy) begin
+				$display("Dumping all passed!"); 
+				$stop;
+		end
+		
 		
 		repeat (10) @(posedge clk);
 	end
 	
-	
-	/***************************
-	logic [8:0] i;
-	//we still need a RAMqueue interface...Pontentially in capture?
-	initial begin 
-		$monitor("response: %b", resp);
-	end
-	initial begin 
-	clk = 0;
-	we = 0;
-	cmd_rdy = 0;
-	rst_n = 0;
-	resp_sent = 0;
-	set_capture_done = 0;
-	waddr_ctr = 8'h00;
-	waddr = 0;
-	wdata = 8'h00;
-	repeat (2) @(posedge clk);
-	//write some data to ram queue
-	we = 1;
-	for(i = 0; i < 384; i = i + 1)begin
-		waddr = waddr + 1;
-		wdata = wdata + 1;
-		repeat (1) @(posedge clk);
-	end
-	we = 0;
-	//write to a reg MaskH 0x4B55
-	cmd = 16'b0100101101010101;
-	repeat (2) @(posedge clk);
-	cmd_rdy = 1;
-	//wait for the all clear
-	while(!clr_cmd_rdy)
-		repeat (1) @(posedge clk);
-		
-		
-	//read reg MaskH
-	//cmd = 16'h0B55;
-	cmd = 16'b0000101101010101;
-	repeat (2) @(posedge clk);
-	cmd_rdy = 1;	
-	while(!clr_cmd_rdy)
-		repeat (1) @(posedge clk);	
-	if(resp == 8'h55)
-		$display("write and read worked worked!");
-	//dump channel 1
-	//cmd = 16'h8100;
-	cmd = 16'b1000000100000000;
-	repeat (2) @(posedge clk)
-	cmd_rdy = 1;
-	while(!clr_cmd_rdy)
-		repeat (1) @(posedge clk);
-		
-	$display("cmd_cfg is functional :)");
-	$stop(); //passed
-	end
-	//forces cmd_rdy to 0 when clr_cmd_rdy is asserted
-	always @(posedge clr_cmd_rdy) cmd_rdy = 0;
-	always #5 clk = ~clk;
-	//timeout
+	//initialize a testing RAM queue
 	initial begin
-		repeat(500000) @(posedge clk);
-		$stop(); //Boo
-	end
-	******************************/	
+ 		waddr = 0;
+ 		wdata = 8'h00;
+ 		repeat (2) @(posedge clk);
+ 		//write some data to ram queue
+ 		we = 1;
+ 		for(i = 0; i < 384; i = i + 1)begin
+ 			waddr = waddr + 1;
+			wdata = wdata + 1 % 384;
+ 			repeat (1) @(posedge clk);
+ 		end
+ 		we = 0;
+ 	end
+ 	
 endmodule
