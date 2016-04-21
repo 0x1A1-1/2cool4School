@@ -1,20 +1,24 @@
 This is the group final project for ECE551
 
-TEAM 2'b10 Cool 3'b100 School
-
+Team Name: 2'b10 Cool 3'b100 School
+Team Members: Xiao, Matt, Christian, Heng
 Project: Logic Analyzer
 
-Team: Xiao, Matt, Christian, Heng
+NOTES:
+-capture_cntrl_for_later_use.sv was deleted. use capture_cntrl.sv from now on. 
+-SEE NOTES IN capture_cntrl.sv!!!
+-ADDED dig_core.sv to project
 
 TODO:
 [] implement state machine logic in cmd_cfg
-[] match and mask checking should be        mask & (match ^ data) == (match ^ data)       in UART_RX_trig
 [] channel_trigger_logic should be "negedge set_armed"
+[] capture_cntrl needs to output ram_addr for cmd_cfg
+[] instantiate and connect all modules in dig_core.sv
 
 DONE:
-[-]Q3 & PROOF 
-[-]Q2 testbench
-[-]channel trigger logic has been modifeid by Heng, should now works
-[-]there are two versions of capture_cntrl, one is simple version, named capture_ctrl, should covered what we need for HW5_2, full verision is capture_cntrl_for_later_use, which should covered full functions for this unit
+[-] Q3 & PROOF 
+[-] Q2 testbench
+[-] channel trigger logic has been modifeid by Heng, should now works
+[-] there are two versions of capture_cntrl, one is simple version, named capture_ctrl, should covered what we need for HW5_2, full verision is capture_cntrl_for_later_use, which should covered full functions for this unit
 [-] implement dumping logic in cmd_cfg. We have modified Heng's version and is the one we will be working with
-
+[-] match and mask checking should be        mask & (match ^ data) == (match ^ data)       in UART_RX_trig
