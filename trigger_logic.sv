@@ -4,9 +4,9 @@ input CH1Trig, CH2Trig, CH3Trig, CH4Trig, CH5Trig, protTrig;
 input armed, set_capture_done;
 input clk, rst_n;
 
-reg d;
+logic d;
 
-output reg triggered;
+output logic triggered;
 
 always_comb
 	d = ~(set_capture_done | ~(triggered | (armed & (CH1Trig & CH2Trig & CH3Trig & CH4Trig & CH5Trig & protTrig))));

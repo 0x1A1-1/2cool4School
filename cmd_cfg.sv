@@ -12,14 +12,14 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 	localparam WR = 2'b01;
 	localparam DMP = 2'b10;
 	
-	input clk, rst_n; 				//system clk and rst_n
+	input clk, rst_n; 					//system clk and rst_n
 
 	///////////////////////////////////////////
 	//           INPUTS FROM UART            //
 	///////////////////////////////////////////
-	input [15:0] cmd; 				//16 bit command from UART 
-	input cmd_rdy; 					//cmd is ready for use
-	input resp_sent; 				//asserted when transmission of resp to host is finished. Data has been read
+	input [15:0] cmd; 					//16 bit command from UART 
+	input cmd_rdy; 							//cmd is ready for use
+	input resp_sent; 						//asserted when transmission of resp to host is finished. Data has been read
 	input set_capture_done; 		//sets capture done bit
 	
 	///////////////////////////////////////////
@@ -60,25 +60,25 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 	//            INTERNAL SIGNALS           //
 	///////////////////////////////////////////
 	logic [LOG2-1:0] start_addr;	//address we start reading from. used to check if we have wrapped all the way around
-	logic [7:0] response; 			//used by FSM to set value in resp
-	logic start_dump;	        	//fire off a read of channel RAMs
+	logic [7:0] response; 				//used by FSM to set value in resp
+	logic start_dump;	        		//fire off a read of channel RAMs
 	logic wrt_reg;               	//asserted when write reg happens
-	logic inc_addr;					//used by FSM to increment the RAM raddrCHx
-	logic rd_done;					//asserted when we wrap all the way around to addr we started
+	logic inc_addr;								//used by FSM to increment the RAM raddrCHx
+	logic rd_done;								//asserted when we wrap all the way around to addr we started
 
 	///////////////////////////////////////////
 	//             cmd DISSECTION            //
 	///////////////////////////////////////////
-	logic [1:0] op;  				//opcode from cmd[15:14]
+	logic [1:0] op;  							//opcode from cmd[15:14]
 	assign op = cmd[15:14];
 	
-	logic [5:0] addr; 				//address from which to read
+	logic [5:0] addr; 						//address from which to read
 	assign addr = cmd[13:8];
 
-	logic [2:0] dmp_chnnl; 			//dump channel reading
+	logic [2:0] dmp_chnnl; 				//dump channel reading
 	assign dmp_chnnl = cmd[10:8];
 
-	logic [7:0] data; 				//data to be written
+	logic [7:0] data; 						//data to be written
 	assign data = cmd[7:0];
 
 	///////////////////////////////////////////
@@ -229,12 +229,16 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 	///////////////////////////////////////////
 
 	//resp ff
+	/*
 	always_ff @(posedge clk, negedge rst_n) begin
 		if(!rst_n) 
 			resp <= 8'h00;
 		else 
 			resp <= response;
 	end
+	//*/
+
+	assign resp = response;
 
 	//start_addr ff
 	always_ff @(posedge clk, negedge rst_n) begin
@@ -258,13 +262,13 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 	end
 
 	//if the addr_ptr value reaches back around to where it started then we are done
-	assign rd_done = (addr_ptr == start_addr) ? 1 : 0;
+	assign rd_done = ((addr_ptr == start_addr) && resp_sent);
 			
 	///////////////////////////////////////////
 	//               MAIN FSM                //
 	///////////////////////////////////////////
 	//TODO: fix number of bits used when states finalized
-	typedef enum reg [1:0] {IDLE, RESPOND, DUMP, DUMPING} state_t;
+	typedef enum reg [2:0] {IDLE, RESPOND, DUMP, DUMPING, LAST_DUMP} state_t;
 	state_t state, nxt_state;
 	
 	//state ff
@@ -293,7 +297,8 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 					case(op)
 					
 						RD: begin //read 
-							case(addr)								
+							case(addr)	
+								6'h00: response = {2'b00, TrigCfg};							
 								6'h01: response = {3'b000, CH1TrigCfg};
 								6'h02: response = {3'b000, CH2TrigCfg};
 								6'h03: response = {3'b000, CH3TrigCfg};
@@ -310,19 +315,24 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 								6'h0E: response = baud_cntL;
 								6'h0F: response = trig_posH; 
 								6'h10: response = trig_posL;
-								default: response = {2'b00, TrigCfg};
+								default: response = 8'hEE;
 							endcase
 							//TODO: do we need to wait here for the UART to be done sending?		
-							nxt_state = IDLE;	
-							clr_cmd_rdy = 1;
+							nxt_state = RESPOND;	
 							send_resp = 1;
 						end
 						
 						WR: begin //write
 							wrt_reg = 1;
-							response = 8'hA5; //TODO: may need to send ack one clock period later
+							if(addr <= 6'h10) begin
+								response = 8'hA5; 
+								nxt_state = RESPOND;
+							end
+							else begin
+								response = 8'hEE;
+								nxt_state = RESPOND;
+							end
 							send_resp = 1;
-							nxt_state = RESPOND;
 						end	
 						
 						DMP: begin //dump
@@ -360,15 +370,15 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 					3'b100: response = rdataCH4;
 					default: response = rdataCH5;	//default reading CH5
 				endcase
+
+				inc_addr = 1;
+				send_resp = 1;
 				
 				if(rd_done) begin //when last bit is read, jump out of DUMP state
-					clr_cmd_rdy = 1;
-					nxt_state = IDLE;
+					nxt_state = LAST_DUMP;
 				end 
 				else begin
-					nxt_state = DUMPING;
-					inc_addr = 1;
-					send_resp = 1;
+					nxt_state = DUMPING;				
 				end
 			end
 			
@@ -381,6 +391,15 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 				else begin
 					nxt_state = DUMPING;//waiting and looping here until resp_sent finished
 				end
+			end
+
+			LAST_DUMP: begin
+				if(resp_sent) begin
+					clr_cmd_rdy = 1;
+					nxt_state = IDLE;
+				end
+				else
+					nxt_state = LAST_DUMP;
 			end
 			
 			default: begin //when none, send back neg ack 0XEE

@@ -47,7 +47,7 @@ assign shift = (baud_counter == baud_cnt) ? 1 : 0;
 /////////// UARTtrig /////////////
 always_ff @(posedge clk, negedge rst_n) begin
 	if(!rst_n) UARTtrig <= 0;
-	else if(rdy) UARTtrig <= (match[7:0] ^ rx_shift_reg[7:0] == mask[7:0]) ? 1 : 0;
+	else if(rdy) UARTtrig <= (match[7:0] ^ rx_shift_reg[7:0] == (match[7:0] ^ rx_shift_reg[7:0]) & mask[7:0]) ? 1 : 0;
 	else UARTtrig <= 0; 
 end
 

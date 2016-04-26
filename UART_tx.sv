@@ -1,4 +1,4 @@
-module UART_TX(clk, rst_n, trmt, tx_data, TX, tx_done);
+module UART_tx(clk, rst_n, trmt, tx_data, TX, tx_done);
 
 input clk, rst_n;
 input trmt;

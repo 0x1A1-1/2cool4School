@@ -1,0 +1,78 @@
+# Reading C:/ProgramData/App-V/2191B702-5279-4048-91BA-BCF8F2A20B49/21710E5E-1DEB-4C76-9578-9609978C17F5/Root/tcl/vsim/pref.tcl
+# //  ModelSim SE 10.3c Jul 19 2014 
+# //
+# //  Copyright 1991-2014 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION
+# //  WHICH IS THE PROPERTY OF MENTOR GRAPHICS CORPORATION OR ITS
+# //  LICENSORS AND IS SUBJECT TO LICENSE TERMS.
+# //
+# OpenFile I:/ece551/ProjectCollateral2/LogicAnalyzer.mpf
+# Loading project LogicAnalyzer
+# Error opening I:/ece551/ProjectCollateral2/DigCore.sv
+# Path name 'I:/ece551/ProjectCollateral2/DigCore.sv' doesn't exist.
+# Error opening I:/ece551/ProjectCollateral2/DigCore.sv
+# Path name 'I:/ece551/ProjectCollateral2/DigCore.sv' doesn't exist.
+# Compile of AFE.v was successful.
+# Compile of channel_sample.sv was successful.
+# Compile of channel_sample_tb.sv was successful.
+# Compile of channel_trigger_logic.sv was successful.
+# Compile of clk_rst_smpl.sv was successful.
+# Compile of cmd_cfg.sv was successful.
+# Compile of cmd_cfg_tb.sv was successful.
+# Compile of CommMaster.sv was successful.
+# Compile of dig_core.sv failed with 1 errors.
+# Compile of dual_PWM.sv was successful.
+# Compile of LA_dig.sv was successful.
+# Compile of LA_dig_tb.sv failed with 1 errors.
+# Compile of pll8x.v was successful.
+# Compile of prot_trig.sv was successful.
+# Compile of pwm8.sv was successful.
+# Compile of RAMqueue.v was successful.
+# Compile of RAMqueue_post_synth.v was successful.
+# Compile of rst_sync.v was successful.
+# Compile of SPI_RX.sv was successful.
+# Compile of trigger_logic.sv was successful.
+# Compile of UART.sv was successful.
+# Compile of UART_rx.sv was successful.
+# Compile of UART_rx_trig.sv was successful.
+# Compile of UART_tx.sv was successful.
+# Compile of UART_wrapper.sv was successful.
+# Compile of capture_cntrl.sv failed with 1 errors.
+# 26 compiles, 3 failed with 3 errors.
+# Compile of channel_trigger_logic.sv was successful.
+# Compile of capture_cntrl.sv was successful.
+# Compile of capture_cntrl.sv failed with 1 errors.
+# Compile of capture_cntrl.sv failed with 1 errors.
+# Compile of capture_cntrl.sv failed with 1 errors.
+# Compile of capture_cntrl.sv was successful.
+# Compile of AFE.v was successful.
+# Compile of channel_sample.sv was successful.
+# Compile of channel_sample_tb.sv was successful.
+# Compile of channel_trigger_logic.sv was successful.
+# Compile of clk_rst_smpl.sv was successful.
+# Compile of cmd_cfg.sv was successful.
+# Compile of cmd_cfg_tb.sv was successful.
+# Compile of CommMaster.sv was successful.
+# Compile of dig_core.sv failed with 1 errors.
+# Compile of dual_PWM.sv was successful.
+# Compile of LA_dig.sv was successful.
+# Compile of LA_dig_tb.sv failed with 1 errors.
+# Compile of pll8x.v was successful.
+# Compile of prot_trig.sv was successful.
+# Compile of pwm8.sv was successful.
+# Compile of RAMqueue.v was successful.
+# Compile of RAMqueue_post_synth.v was successful.
+# Compile of rst_sync.v was successful.
+# Compile of SPI_RX.sv was successful.
+# Compile of trigger_logic.sv was successful.
+# Compile of UART.sv was successful.
+# Compile of UART_rx.sv was successful.
+# Compile of UART_rx_trig.sv was successful.
+# Compile of UART_tx.sv was successful.
+# Compile of UART_wrapper.sv was successful.
+# Compile of capture_cntrl.sv was successful.
+# 26 compiles, 2 failed with 2 errors.
+# Compile of dig_core.sv was successful.
+# Compile of dig_core.sv was successful.

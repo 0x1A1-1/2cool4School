@@ -1,4 +1,10 @@
-module RAMqueue(clk,we,waddr,raddr,wdata,rdata);
+module RAMqueue_ENTRIES384_LOG29(clk,we,waddr,raddr,wdata,rdata);
+  /*************************************************
+  * Synopsys will rename the black box entries for *
+  * the RAMqueues with what value the  parameters  *
+  * were.  Therefore you will need this version    *
+  * for post synthesis simulation.                 *
+  *************************************************/
 
   parameter ENTRIES = 384,	// defaults to 384 for simulation, use 12288 for DE-0
             LOG2 = 9;		// Log base 2 of number of entries

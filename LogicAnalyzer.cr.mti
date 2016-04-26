@@ -1,0 +1,168 @@
+I:/ece551/ProjectCollateral2/UART_rx.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/UART_rx.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module UART_rx
+
+Top level modules:
+	UART_rx
+
+} {} {}} I:/ece551/ProjectCollateral2/UART_tx.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/UART_tx.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module UART_tx
+
+Top level modules:
+	UART_tx
+
+} {} {}} I:/ece551/ProjectCollateral2/channel_sample_tb.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/channel_sample_tb.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module channel_sample_tb
+
+Top level modules:
+	channel_sample_tb
+
+} {} {}} I:/ece551/ProjectCollateral2/dual_PWM.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/dual_PWM.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module dual_PWM
+
+Top level modules:
+	dual_PWM
+
+} {} {}} I:/ece551/ProjectCollateral2/channel_sample.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/channel_sample.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module sampler_reg
+
+Top level modules:
+	sampler_reg
+
+} {} {}} I:/ece551/ProjectCollateral2/cmd_cfg.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/cmd_cfg.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module cmd_cfg
+
+Top level modules:
+	cmd_cfg
+
+} {} {}} I:/ece551/ProjectCollateral2/dig_core.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/dig_core.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module dig_core
+
+Top level modules:
+	dig_core
+
+} {} {}} I:/ece551/ProjectCollateral2/RAMqueue_post_synth.v {1 {vlog -work work -vopt -stats=none I:/ece551/ProjectCollateral2/RAMqueue_post_synth.v
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module RAMqueue_ENTRIES384_LOG29
+
+Top level modules:
+	RAMqueue_ENTRIES384_LOG29
+
+} {} {}} I:/ece551/ProjectCollateral2/SPI_RX.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/SPI_RX.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module SPI_RX
+
+Top level modules:
+	SPI_RX
+
+} {} {}} I:/ece551/ProjectCollateral2/pll8x.v {1 {vlog -work work -vopt -stats=none I:/ece551/ProjectCollateral2/pll8x.v
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module pll8x
+
+Top level modules:
+	pll8x
+
+} {} {}} I:/ece551/ProjectCollateral2/clk_rst_smpl.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/clk_rst_smpl.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module clk_rst_smpl
+
+Top level modules:
+	clk_rst_smpl
+
+} {} {}} I:/ece551/ProjectCollateral2/LA_dig_tb.sv {0 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/LA_dig_tb.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module LA_dig_tb
+** Error: I:/ece551/ProjectCollateral2/LA_dig_tb.sv(104): Cannot find `include file "tb_tasks.v" in directories:
+    C:/ProgramData/App-V/2191B702-5279-4048-91BA-BCF8F2A20B49/21710E5E-1DEB-4C76-9578-9609978C17F5/Root/ovm-2.1.2/../verilog_src/ovm-2.1.2/src, C:/ProgramData/App-V/2191B702-5279-4048-91BA-BCF8F2A20B49/21710E5E-1DEB-4C76-9578-9609978C17F5/Root/uvm-1.1d/../verilog_src/uvm-1.1d/src
+
+} {4.0 5.0} {}} I:/ece551/ProjectCollateral2/LA_dig.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/LA_dig.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module LA_dig
+
+Top level modules:
+	LA_dig
+
+} {} {}} I:/ece551/ProjectCollateral2/CommMaster.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/CommMaster.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module CommMaster
+
+Top level modules:
+	CommMaster
+
+} {} {}} I:/ece551/ProjectCollateral2/cmd_cfg_tb.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/cmd_cfg_tb.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module cmd_cfg_tb
+
+Top level modules:
+	cmd_cfg_tb
+
+} {} {}} I:/ece551/ProjectCollateral2/AFE.v {1 {vlog -work work -vopt -stats=none I:/ece551/ProjectCollateral2/AFE.v
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module AFE
+
+Top level modules:
+	AFE
+
+} {} {}} I:/ece551/ProjectCollateral2/trigger_logic.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/trigger_logic.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module trigger_logic
+
+Top level modules:
+	trigger_logic
+
+} {} {}} I:/ece551/ProjectCollateral2/prot_trig.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/prot_trig.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module prot_trig
+
+Top level modules:
+	prot_trig
+
+} {} {}} I:/ece551/ProjectCollateral2/RAMqueue.v {1 {vlog -work work -vopt -stats=none I:/ece551/ProjectCollateral2/RAMqueue.v
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module RAMqueue
+
+Top level modules:
+	RAMqueue
+
+} {} {}} I:/ece551/ProjectCollateral2/rst_sync.v {1 {vlog -work work -vopt -stats=none I:/ece551/ProjectCollateral2/rst_sync.v
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module reset_synch
+
+Top level modules:
+	reset_synch
+
+} {} {}} I:/ece551/ProjectCollateral2/UART_rx_trig.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/UART_rx_trig.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module UART_RX_trig
+
+Top level modules:
+	UART_RX_trig
+
+} {} {}} I:/ece551/ProjectCollateral2/pwm8.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/pwm8.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module pwm8
+
+Top level modules:
+	pwm8
+
+} {} {}} I:/ece551/ProjectCollateral2/UART.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/UART.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module UART
+
+Top level modules:
+	UART
+
+} {} {}} I:/ece551/ProjectCollateral2/UART_wrapper.sv {1 {vlog -work work -vopt -sv -stats=none I:/ece551/ProjectCollateral2/UART_wrapper.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module UART_wrapper
+
+Top level modules:
+	UART_wrapper
+
+} {} {}}

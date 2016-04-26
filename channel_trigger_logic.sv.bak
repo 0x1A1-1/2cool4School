@@ -28,7 +28,7 @@ end
 
 //1'b1 CHxLff5 flop
 always_ff @(negedge CHxLff5, negedge armed) begin
-	if(!armed)
+	if(!set_armed)
 		Lff1_1 <= 1'b0; //TODO: how do we know what to reset to?
 	else
 		Lff1_1 <= 1'b1;

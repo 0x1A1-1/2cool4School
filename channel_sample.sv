@@ -6,8 +6,8 @@ input CH_Low, CH_High;
 logic CHLff1, CHLff2, CHLff3, CHLff4;
 logic CHHff1, CHHff2, CHHff3, CHHff4; 
 
-output reg [7:0] smpl;
-output reg CHLff5, CHHff5;
+output logic [7:0] smpl;
+output logic CHLff5, CHHff5;
 
 ////////// CH_Low flops //////////
 always_ff @(negedge smpl_clk) begin

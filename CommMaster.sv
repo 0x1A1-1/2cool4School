@@ -14,7 +14,7 @@ logic trmt, sel, tx_done;
 
 output logic TX, cmd_cmplt;
 
-UART(	.clk(clk), .rst_n(rst_n), 
+UART uart(	.clk(clk), .rst_n(rst_n), 
 		.TX(TX), .trmt(trmt), .tx_data(tx_data), .tx_done(tx_done), 
 		.RX(RX), .rdy(rdy), .rx_data(rx_data), .clr_rdy(clr_rdy));
 
