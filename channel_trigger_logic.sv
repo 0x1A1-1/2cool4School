@@ -45,7 +45,7 @@ end
 
 //CHxLff5 flop
 always_ff @(posedge clk) begin
-	Lff2 <= CHxLff5;
+	Lff2 <= ~CHxLff5;
 end
 		
 endmodule
