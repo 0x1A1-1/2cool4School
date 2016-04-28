@@ -1,3 +1,17 @@
+module tb_tasks();
+
+////// Stimulus is declared as type reg ///////
+reg REF_CLK, RST_n;
+reg [15:0] host_cmd;			// command host is sending to DUT
+reg snd_cmd;					// asserted to initiate sending of command
+reg clr_resp_rdy;				// asserted to knock down resp_rdy
+reg [1:0] clk_div;				// counter used to derive 100MHz clk from clk400MHz
+reg strt_tx;					// kick off unit used for protocol triggering
+wire clk;
+wire [7:0] resp;
+wire resp_rdy;	
+
+
 parameter TRIG_CFG = 6'b000000;
 parameter CH1TRIG_CFG = 6'b000001;
 parameter CH2TRIG_CFG = 6'b000010;
@@ -25,33 +39,37 @@ parameter NEG_ACK = 8'hEE;
 
 //initializing the logic analyzer
 task initialize;
-	REF_CLK = 0;
-	host_cmd = 0;
-	send_cmd = 0;
-	clr_resp_rdy = 0;
-	clk_div = 0; 
-	strt_tx = 0;
+	begin
+		REF_CLK = 0;
+		host_cmd = 0;
+		snd_cmd = 0;
+		clr_resp_rdy = 0;
+		clk_div = 0; 
+		strt_tx = 0;
 
-	RST_n = 1;
-	repeat (10) @(negedge clk)
-	RST_n = 0;
-	repeat (10) @(negedge clk)
-	RST_n = 1;	
-	$disaplay("initialize done")
+		RST_n = 1;
+		repeat (10) @(negedge clk)
+		RST_n = 0;
+		repeat (10) @(negedge clk)
+		RST_n = 1;	
+		$disaplay("initialize done");
+	end
 endtask// initialize
 
 //sending cmd via UART into design
-task sndcmd;
+task sndcmd; 
 	input  [15:0] mstr_cmd; // mstr_cmd = {CMD[1:0],ADDR[5:0],DATA[7:0]}
+begin
 	host_cmd = mstr_cmd;
-	send_cmd = 1;
+	snd_cmd = 1;
 	$display("CMD sent");
+end
 endtask//sndcmd
 
 //check the response from our desgin
 task chkresp;
 	input [7:0] resp_req; //response require to have refer to our design
-	
+begin
 	fork
 		begin: timeout1
 			repeat(70000) @(posedge clk);
@@ -68,6 +86,7 @@ task chkresp;
 				$display("response received but incorrect");
 		end					
 	join
-
+end
 endtask//ckresp
 
+endmodule
