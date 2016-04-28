@@ -95,6 +95,24 @@ SPI_mstr iSPI(.clk(clk),.rst_n(rst_n),.SS_n(SS_n),.SCLK(SCLK),.wrt(strt_tx),.don
 
 initial begin
   //   put your testing code here.
+  
+    // openning dump file to write
+  fptr1 = $fopen("CH1dmp.txt","w");
+  fptr2 = $fopen("CH2dmp.txt","w");
+  fptr3 = $fopen("CH3dmp.txt","w");
+  fptr4 = $fopen("CH4dmp.txt","w");
+  fptr5 = $fopen("CH5dmp.txt","w");
+  
+  //initialize design
+  initialize;
+ 
+  //first test: writing to trig_cfg and read from trig_cfg
+  sndcmd({WR,TRIG_CFG, 8'h16});
+  chkresp(8'hA5);
+  repeat(10) @ (negedge clk);
+  sndcmd({RD,TRIG_CFG, 8'h00});
+  chkresp(8'h16);
+  
 end
 
 always
