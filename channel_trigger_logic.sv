@@ -1,6 +1,6 @@
-module channel_trigger_logic(clk, set_armed, CHxHff5, CHxLff5, CHxTrigCfg, ChxTrig);
+module channel_trigger_logic(clk, armed, CHxHff5, CHxLff5, CHxTrigCfg, ChxTrig);
 
-input clk, set_armed, CHxHff5, CHxLff5;
+input clk, armed, CHxHff5, CHxLff5;
 input [4:0] CHxTrigCfg; //we only use the 5 bits of the register
 
 output logic ChxTrig;
@@ -15,7 +15,7 @@ assign positive_edge = Hff1_2 & CHxTrigCfg[4];
 assign ChxTrig = CHxTrigCfg[0] | low_level | high_level | negative_edge | positive_edge;
 
 //1'b1 CHxHff5 flop
-always_ff @(posedge CHxHff5, negedge set_armed) begin
+always_ff @(posedge CHxHff5, negedge armed) begin
 	if(!set_armed)
 		Hff1_1 <= 1'b0; //TODO: how do we know what to reset to?
 	else 
