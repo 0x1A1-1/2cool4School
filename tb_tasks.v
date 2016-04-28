@@ -89,4 +89,13 @@ begin
 end
 endtask//ckresp
 
+task chkdump1
+	begin
+		host_cmd = 16'b10_000_001_00000000; //dump channel 1
+		snd_cmd = 1;
+		while
+		
+	end
+endtask
+
 endmodule
