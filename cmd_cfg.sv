@@ -47,7 +47,7 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 	output logic [7:0] matchH, matchL;
 	output logic [7:0] maskH, maskL;
 	output logic [7:0] baud_cntH, baud_cntL;
-	output logic [LOG2-1:0] trig_posH, trig_posL;
+	output logic [7:0] trig_posH, trig_posL;
 	
 	///////////////////////////////////////////
 	//            OUTPUTS TO UART            //
