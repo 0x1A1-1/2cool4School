@@ -52,7 +52,7 @@ module LA_dig(clk400MHz,RST_n,locked,VIH_PWM,VIL_PWM,CH1L,CH1H,CH2L,CH2H,CH3L,CH
   ///////////////////////////////////////////////////////////////
   // Instantiate UART_Wrapper that handles host communication //
   /////////////////////////////////////////////////////////////
-  UART_Wrapper iCOMM(.clk(clk), .rst_n(rst_n), .RX(RX), .TX(TX), .resp(resp),
+  UART_wrapper iCOMM(.clk(clk), .rst_n(rst_n), .RX(RX), .TX(TX), .resp(resp),
                      .send_resp(send_resp), .resp_sent(resp_sent),
 			         .cmd_rdy(cmd_rdy), .cmd(cmd), .clr_cmd_rdy(clr_cmd_rdy));
 			
