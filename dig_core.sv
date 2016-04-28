@@ -68,7 +68,7 @@ module dig_core(clk, rst_n, smpl_clk, wrt_smpl, decimator, VIH, VIL, CH1L, CH1H,
 	channel_trigger_logic iCH4Trig(.clk(clk), .armed(armed), .CHxHff5(CH4Hff5), .CHxLff5(CH4Lff5), .CHxTrigCfg(CH4TrigCfg), .ChxTrig(CH4Trig));
 	channel_trigger_logic iCH5Trig(.clk(clk), .armed(armed), .CHxHff5(CH5Hff5), .CHxLff5(CH5Lff5), .CHxTrigCfg(CH5TrigCfg), .ChxTrig(CH5Trig));
 
-	prot_trig iprotTrig(.clk(clk), .rst_n(rst_n), .TrigCfg(TrigCfg), .CH1L(CH1L), .CH2L(CH2L), .CH3L(CH3L), .baud_cntH(baud_cntH), .baud_cntL(baud_cntL), .maskH(maskH), .maskL(maskL), .matchH(matchH), .matchL(matchL), .protTrig(protTrig));
+	prot_trig iprotTrig(.clk(clk), .rst_n(rst_n), .TrigCfg(TrigCfg[3:0]), .CH1L(CH1L), .CH2L(CH2L), .CH3L(CH3L), .baud_cntH(baud_cntH), .baud_cntL(baud_cntL), .maskH(maskH), .maskL(maskL), .matchH(matchH), .matchL(matchL), .protTrig(protTrig));
 
 	trigger_logic itrigLogic(.clk(clk), .rst_n(rst_n), .CH1Trig(CH1Trig), .CH2Trig(CH2Trig), .CH3Trig(CH3Trig), .CH4Trig(CH4Trig), .CH5Trig(CH5Trig), .protTrig(protTrig), .armed(armed), .set_capture_done(set_capture_done), .triggered(triggered));
 	
