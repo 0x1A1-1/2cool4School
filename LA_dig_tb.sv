@@ -61,7 +61,7 @@ assign {CH3H_mux,CH3L_mux} = (SPI_triggering) ? {2{MOSI}}: 			// assign to outpu
 LA_dig iDUT(.clk400MHz(clk400MHz),.RST_n(RST_n),.locked(locked),
             .VIH_PWM(VIH_PWM),.VIL_PWM(VIL_PWM),.CH1L(CH1L_mux),.CH1H(CH1H_mux),
 			.CH2L(CH2L_mux),.CH2H(CH2H_mux),.CH3L(CH3L_mux),.CH3H(CH3H_mux),.CH4L(CH4L),
-			.CH4H(CH4H),.CH5L(CH5L),.CH5H(CH5H),.RX(RX),.TX(TX));
+			.CH4H(CH4H),.CH5L(CH5L),.CH5H(CH5H),.RX(RX),.TX(TX), .LED());
 
 ///// Instantiate PLL to provide 400MHz clk from 50MHz ///////
 pll8x iPLL(.ref_clk(REF_CLK),.RST_n(RST_n),.out_clk(clk400MHz),.locked(locked));
@@ -76,15 +76,15 @@ always @(posedge clk400MHz, negedge locked)
 assign clk = clk_div[1];
 
 //// Instantiate Master UART (mimics host commands) //////
-UART_comm_mstr iMSTR(.clk(clk), .rst_n(RST_n), .RX(TX), .TX(RX),
-                     .cmd(host_cmd), .send_cmd(send_cmd),
-					 .cmd_sent(cmd_sent), .resp_rdy(resp_rdy),
+CommMaster iMSTR(.clk(clk), .rst_n(RST_n), .RX(TX), .TX(RX),
+                     .cmd(host_cmd), .snd_cmd(send_cmd),
+					 .cmd_cmplt(cmd_sent), .resp_rdy(resp_rdy),
 					 .resp(resp), .clr_resp_rdy(clr_resp_rdy));
 					 
 ////////////////////////////////////////////////////////////////
 // Instantiate transmitter as source for protocol triggering //
 //////////////////////////////////////////////////////////////
-uart_tx iTX(.clk(clk), .rst_n(RST_n), .tx(tx_prot), .strt_tx(strt_tx),
+UART_tx iTX(.clk(clk), .rst_n(RST_n), .tx(tx_prot), .strt_tx(strt_tx),
         .tx_data(8'h96), .tx_done());
 					 
 ////////////////////////////////////////////////////////////////////
