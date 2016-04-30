@@ -39,16 +39,12 @@ task initialize;
 		host_cmd = 0;
 		send_cmd = 0;
 		clr_resp_rdy = 0; 
-		strt_tx = 0;
+		strt_tx = 1;
 
 		RST_n = 1;
-		repeat (10) @(negedge REF_CLK);
+		repeat (2) @(negedge REF_CLK);
 		RST_n = 0;
-		repeat (10) @(negedge REF_CLK);
-		RST_n = 1;	
-		repeat (10) @(negedge REF_CLK);
-		RST_n = 0;
-		repeat (10) @(negedge REF_CLK);
+		repeat (2) @(negedge REF_CLK);
 		RST_n = 1;	
 		$display("initialize done");
 	end
@@ -60,7 +56,7 @@ task sndcmd;
 begin
 	host_cmd = mstr_cmd;
 	send_cmd = 1;
-	repeat (10) @(negedge clk);
+	repeat (2) @(negedge clk);
 	send_cmd = 0;
 	$display("Command sent");
 end
@@ -85,8 +81,10 @@ begin
 			clr_resp_rdy = 0; // assert clr_resp_rdy, kick down resp_rdy
 			if(resp_req ==resp) 
 				$display("response received and correct");
-			else
+			else begin
 				$display("response received but incorrect");
+				$stop;
+			end
 		end					
 	join
 end
@@ -103,7 +101,7 @@ begin
 		//checking dump of every address
 		@(posedge resp_rdy);
 		$fdisplay(fptr1, "%h", resp);
-		$display("dumping into CH1 file %h", resp);
+		$display("dumping into CH1 file %b", resp);
 	    end	
 	  end
 	  6'b000010:begin
@@ -111,7 +109,7 @@ begin
 		//checking dump of every address
 		@(posedge resp_rdy);
 		$fdisplay(fptr2, "%h", resp);
-		$display("dumping into CH2 file %h", resp);
+		$display("dumping into CH2 file %b", resp);
 	    end	
 	  end
 	  6'b000011:begin
@@ -119,7 +117,7 @@ begin
 		//checking dump of every address
 		@(posedge resp_rdy);
 		$fdisplay(fptr3, "%h", resp);
-		$display("dumping into CH3 file %h", resp);
+		$display("dumping into CH3 file %b", resp);
 	    end	
 	  end	  
 	  6'b000100:begin
@@ -127,7 +125,7 @@ begin
 		//checking dump of every address
 		@(posedge resp_rdy);
 		$fdisplay(fptr4, "%h", resp);
-		$display("dumping into CH4 file %h", resp);
+		$display("dumping into CH4 file %b", resp);
 	    end	
 	  end
 	  6'b000101:begin
@@ -135,7 +133,7 @@ begin
 		//checking dump of every address
 		@(posedge resp_rdy);
 		$fdisplay(fptr5, "%h", resp);
-		$display("dumping into CH5 file %h", resp);
+		$display("dumping into CH5 file %b", resp);
 	    end	
 	  end
 	 endcase
@@ -143,7 +141,6 @@ begin
 end
 endtask
 
-//pollcapdone needed to be checked before dump, only when capture_done is high can dump go through
 task PollCapDone;
 begin
   $display("checking Capture");
