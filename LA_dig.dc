@@ -30,7 +30,7 @@ read_file -format sverilog { ./dig_core.sv }
 
 #SUPPORTING files
 read_file -format sverilog { ./trigger_logic.sv ./pwm8.sv ./dual_PWM.sv ./clk_rst_smpl.sv}
-read_file -format verilog { ./rst_sync.v }
+read_file -format sverilog { ./reset_synch.sv }
 
 #################################
 #SET CURRENT DESIGN TO TOP LEVEL#
@@ -40,7 +40,7 @@ set current_design LA_dig
 ################################
 #CREATE A 1.25GHz (0.8ns) CLOCK#
 ################################
-create_clock -name "clk400MHz" -period .8 -waveform {0 1} { clk400MHz }
+create_clock -name "clk400MHz" -period .8 -waveform {0 .4} { clk400MHz }
 set_dont_touch_network [find port clk400MHz]
 
 #clk is main 100MHz system clock derived from clk400MHz
@@ -72,7 +72,7 @@ set_input_delay -clock clk 0.25 $RX_input
 ###################################################
 #INPUT DELAY 0.25ns ON smpl_clk FALL FOR CH INPUTS#
 ###################################################
-set CH_inputs {CH1H CH1L CH2H CH2L CH3H CH3L CH4H CH4L CH5H CH5L }
+set CH_inputs {CH1H CH1L CH2H CH2L CH3H CH3L CH4H CH4L CH5H CH5L}
 set_input_delay -clock smpl_clk .25 -clock_fall $CH_inputs
 
 #####################################################

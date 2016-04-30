@@ -5,14 +5,14 @@ input RX;
 input [15:0] baud_cnt;
 input [7:0] match, mask;
 
-output reg UARTtrig;
+output logic UARTtrig;
 
 logic [3:0] bit_cnt;
 logic [15:0] baud_counter;
 logic [8:0] rx_shift_reg;
 
 logic start, rdy, receiving;
-wire shift;
+logic shift;
 
 //////////// bit_cnt  ///////////////
 always_ff @(posedge clk, negedge rst_n) begin

@@ -8,9 +8,9 @@ input RX;
 logic byte_rdy;					//high when UART is done rxing a byte
 logic clr_rdy; 					//set by state machine when we are done with this byte
 logic byte_sel;					//set by state machine depending on which byte we need to recirculate
-logic set_cmd_rdy;			//set by state machine when we are done receiving two bytes
-logic [7:0] high_byte;	//the flop we are using to store the byte. High byte of cmd
-logic [7:0] low_byte;		//net connected to rx_data from the 8-bit UART. Low btye of cmd
+logic set_cmd_rdy;				//set by state machine when we are done receiving two bytes
+logic [7:0] high_byte;			//the flop we are using to store the byte. High byte of cmd
+logic [7:0] low_byte;			//net connected to rx_data from the 8-bit UART. Low btye of cmd
 
 output TX;
 output resp_sent;
@@ -20,7 +20,6 @@ output [15:0] cmd;
 UART UART_8bit(.clk(clk), .rst_n(rst_n), .TX(TX), .trmt(send_resp), .tx_data(resp), 
 	.tx_done(resp_sent), .RX(RX), .rdy(byte_rdy), .rx_data(low_byte), .clr_rdy(clr_rdy));
 
-
 ///////////////high byte select////////////////
 always_ff @(posedge clk, negedge rst_n) begin
 	if(!rst_n) 
@@ -28,7 +27,6 @@ always_ff @(posedge clk, negedge rst_n) begin
 	else if(byte_sel) 
 		high_byte <= low_byte;
 end
-
 
 ////////////// cmd_rdy ////////////////////
 always_ff @(posedge clk, negedge rst_n) begin
@@ -41,7 +39,6 @@ always_ff @(posedge clk, negedge rst_n) begin
 end
 
 assign cmd = {high_byte[7:0], low_byte[7:0]};
-
 
 //////////////state machine logic/////////
 typedef enum reg [1:0] {HIGH_BYTE, LOW_BYTE, DONE} state_t;
@@ -59,6 +56,7 @@ always_comb begin
 	byte_sel = 0;
 	clr_rdy = 0;
 	set_cmd_rdy = 0;
+	next_state = HIGH_BYTE;
 
 	case(state)
 		HIGH_BYTE:

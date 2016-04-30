@@ -77,9 +77,9 @@ assign clk = clk_div[1];
 
 //// Instantiate Master UART (mimics host commands) //////
 CommMaster iMSTR(.clk(clk), .rst_n(RST_n), .RX(TX), .TX(RX),
-                     .cmd(host_cmd), .snd_cmd(send_cmd),
-					 .cmd_cmplt(cmd_sent), .resp_rdy(resp_rdy),
-					 .resp(resp), .clr_resp_rdy(clr_resp_rdy));
+		.cmd(host_cmd), .send_cmd(send_cmd),
+		.cmd_sent(cmd_sent), .resp_rdy(resp_rdy),
+		.resp(resp), .clr_resp_rdy(clr_resp_rdy));
 					 
 ////////////////////////////////////////////////////////////////
 // Instantiate transmitter as source for protocol triggering //
@@ -94,62 +94,7 @@ SPI_mstr iSPI(.clk(clk),.rst_n(rst_n),.SS_n(SS_n),.SCLK(SCLK),.wrt(strt_tx),.don
               .data_out(16'h6600),.MOSI(MOSI),.pos_edge(1'b0),.width8(1'b1));
 
 initial begin
- //   put your testing code here.
-  
-  // openning dump file to write
-  fptr1 = $fopen("CH1dmp.txt","w");
-  fptr2 = $fopen("CH2dmp.txt","w");
-  fptr3 = $fopen("CH3dmp.txt","w");
-  fptr4 = $fopen("CH4dmp.txt","w");
-  fptr5 = $fopen("CH5dmp.txt","w");
-  
-  //initialize design
-  initialize;
- 
-  //first test: writing to trig_cfg and read from trig_cfg
-  sndcmd({WR,TRIG_CFG, 8'b001_0010});
-  chkresp(8'hA5);
-  repeat(10) @ (negedge clk);
-  sndcmd({RD,TRIG_CFG, 8'h00});
-  chkresp(8'b0000_0011);
-  
-  //wrong cmd test
-  sndcmd({11,VIH, 8'h46});
-  chkresp(8'hEE);
-
-
-  //change trig_pos
-  sndcmd({WR,TRIG_POS_H,8'h06});
-  chkresp(8'hA5);
-  sndcmd({WR,TRIG_POS_L,8'h55});
-  chkresp(8'hA5);
-
-  //change CHxTrigCfg
-  sndcmd({WR,CH1TRIG_CFG,8'b0000_1000});
-  chkresp(8'hA5);
-  sndcmd({WR,CH1TRIG_CFG,8'b0001_0000});
-  chkresp(8'hA5);
-  
-  //dump test
-  PollCapDone;
-  sndcmd({DUMP,DPCH1, 8'h00});
-  dump(DPCH1);
-  sndcmd({DUMP,DPCH2, 8'h00});
-  dump(DPCH2);
-  sndcmd({DUMP,DPCH3, 8'h00});
-  dump(DPCH3);
-  sndcmd({DUMP,DPCH4, 8'h00});
-  dump(DPCH4);
-  sndcmd({DUMP,DPCH5, 8'h00});
-  dump(DPCH5);
-  
-  $fclose(fptr1);
-  $fclose(fptr2); 
-  $fclose(fptr3);
-  $fclose(fptr4);
-  $fclose(fptr5);     
-  $finish;
-  
+  //   put your testing code here.
 end
 
 always
