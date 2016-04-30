@@ -1,0 +1,132 @@
+###########################
+#READ IN THE VERILOG FILES#
+###########################
+#UART communication
+read_file -format sverilog { ./UART_wrapper.sv ./UART_tx.sv ./UART_rx.sv ./UART.sv }
+
+#PROTOCOL triggering (SPI and UART)
+read_file -format sverilog { ./UART_rx_trig.sv ./SPI_RX.sv ./prot_trig.sv }
+
+#CAPTURE control and command config
+read_file -format sverilog { ./capture_cntrl.sv ./cmd_cfg.sv }
+
+#COMMmaster
+read_file -format sverilog { ./CommMaster.sv }
+
+#RAMqueue
+read_file -format verilog { ./RAMqueue.v }
+
+#CHANNEL sample
+read_file -format sverilog { ./channel_sample.sv }
+
+#CHANNEL triggering
+read_file -format sverilog { ./channel_trigger_logic.sv }
+
+#TOP LEVEL analyzer
+read_file -format sverilog { ./LA_dig.sv }
+
+#DIGITAL core
+read_file -format sverilog { ./dig_core.sv }
+
+#SUPPORTING files
+read_file -format sverilog { ./trigger_logic.sv ./pwm8.sv ./dual_PWM.sv ./clk_rst_smpl.sv}
+read_file -format verilog { ./rst_sync.v }
+
+#################################
+#SET CURRENT DESIGN TO TOP LEVEL#
+#################################
+set current_design LA_dig
+
+################################
+#CREATE A 1.25GHz (0.8ns) CLOCK#
+################################
+create_clock -name "clk400MHz" -period .8 -waveform {0 1} { clk400MHz }
+set_dont_touch_network [find port clk400MHz]
+
+#clk is main 100MHz system clock derived from clk400MHz
+create_generated_clock -name "clk" -source [get_port clk400MHz] -divide_by 4 [get_pins iCLKRST/clk]
+set_dont_touch_network [get_pins iCLKRST/clk]
+
+#smpl_clk is further divided from the clk400MHz by decimator
+create_generated_clock -name "smpl_clk" -source [get_port clk400MHz] -divide_by 1 [get_pins iCLKRST/smpl_clk]
+set_dont_touch_network [get_pins iCLKRST/smpl_clk]
+
+###############################################
+#INPUT DELAY 0.25ns ON ALL INPUTS EXCEPT CLOCK#
+###############################################
+set prim_inputs [remove_from_collection [all_inputs] [find port clk400MHz]]
+set_input_delay -clock clk 0.25 $prim_inputs
+
+##############################################################
+#INPUT DELAY 0.25ns AFTER clk400MHz RISE FOR RST_n and locked#
+##############################################################
+set RST_and_locked {RST_n locked}
+set_input_delay -clock clk 0.25 $RST_and_locked
+
+##########################################
+#INPUT DELAY 0.25ns AFTER clk RISE FOR RX#
+##########################################
+set RX_input {RX}
+set_input_delay -clock clk 0.25 $RX_input
+
+###################################################
+#INPUT DELAY 0.25ns ON smpl_clk FALL FOR CH INPUTS#
+###################################################
+set CH_inputs {CH1H CH1L CH2H CH2L CH3H CH3L CH4H CH4L CH5H CH5L }
+set_input_delay -clock smpl_clk .25 -clock_fall $CH_inputs
+
+#####################################################
+#DRIVE STRENGTH ON ALL INPUTS EXCEPT CLOCK AND RESET#
+#####################################################
+#set all_inputs_no_rst_or_clk [remove_from_collection [remove_from_collection [all_inputs] [find port clk]] [find port rst_n]]
+set_driving_cell -lib_cell ND2D2BWP -from_pin A1 -library tcbn40lpbwptc [all_inputs] 
+#_no_rst_or_clk
+
+#######################################
+#OUTPUT DELAY OF 0.5ns FOR ALL OUTPUTS#
+#######################################
+set_output_delay -clock clk 0.5 [all_outputs]
+
+##################################
+#SET LOAD OF .05pf ON ALL OUTPUTS#
+##################################
+set_load .05 [all_outputs]
+
+##################################
+#MAX TRANSITION TIME ON ALL NODES#
+##################################
+set_max_transition .15 [current_design]
+
+#################
+#WIRE LOAD MODEL#
+#################
+set_wire_load_model -name TSMC32K_Lowk_Conservative -library tcbn40lpbwptc
+
+#############
+#1st COMPILE#
+#############
+compile -map_effort medium
+
+###############
+#FIX THE CLOCK#
+###############
+set_clock_uncertainty 0.15 clk
+set_fix_hold clk
+
+#############
+#2nd COMPILE#
+#############
+ungroup -all -flatten
+compile -map_effort medium 
+
+#########################
+#REPORT TIMINGS AND AREA#
+#########################
+report_timing -delay max > max_delay.rpt
+report_timing -delay min > min_delay.rpt
+report_area > LA_dig_area.txt
+
+#######################
+#WRITE OUT THE NETLIST#
+#######################
+write -format verilog LA_dig -output LA_dig.vg
