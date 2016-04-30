@@ -103,7 +103,7 @@ begin
 		//checking dump of every address
 		@(posedge resp_rdy);
 		$fdisplay(fptr1, "%h", resp);
-		$display("dumping into CH1 file %b", resp);
+		$display("dumping into CH1 file %h", resp);
 	    end	
 	  end
 	  6'b000010:begin
@@ -111,7 +111,7 @@ begin
 		//checking dump of every address
 		@(posedge resp_rdy);
 		$fdisplay(fptr2, "%h", resp);
-		$display("dumping into CH2 file %b", resp);
+		$display("dumping into CH2 file %h", resp);
 	    end	
 	  end
 	  6'b000011:begin
@@ -119,7 +119,7 @@ begin
 		//checking dump of every address
 		@(posedge resp_rdy);
 		$fdisplay(fptr3, "%h", resp);
-		$display("dumping into CH3 file %b", resp);
+		$display("dumping into CH3 file %h", resp);
 	    end	
 	  end	  
 	  6'b000100:begin
@@ -127,7 +127,7 @@ begin
 		//checking dump of every address
 		@(posedge resp_rdy);
 		$fdisplay(fptr4, "%h", resp);
-		$display("dumping into CH4 file %b", resp);
+		$display("dumping into CH4 file %h", resp);
 	    end	
 	  end
 	  6'b000101:begin
@@ -135,7 +135,7 @@ begin
 		//checking dump of every address
 		@(posedge resp_rdy);
 		$fdisplay(fptr5, "%h", resp);
-		$display("dumping into CH5 file %b", resp);
+		$display("dumping into CH5 file %h", resp);
 	    end	
 	  end
 	 endcase
@@ -143,6 +143,7 @@ begin
 end
 endtask
 
+//pollcapdone needed to be checked before dump, only when capture_done is high can dump go through
 task PollCapDone;
 begin
   $display("checking Capture");
