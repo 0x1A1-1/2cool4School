@@ -46,6 +46,10 @@ task initialize;
 		RST_n = 0;
 		repeat (10) @(negedge REF_CLK);
 		RST_n = 1;	
+		repeat (10) @(negedge REF_CLK);
+		RST_n = 0;
+		repeat (10) @(negedge REF_CLK);
+		RST_n = 1;	
 		$display("initialize done");
 	end
 endtask// initialize
@@ -88,9 +92,82 @@ begin
 end
 endtask//ckresp
 
+//writing all the dump resp into file
 task dump;
-	input [15:0] mstr_cmd;
+  input [6:0] CH;
 begin
-	@(posedge resp_rdy)
-	$fdisplay(fptr1, "data is ", resp);
+	$display("start dumping");
+	case(CH)
+	  6'b000001:begin
+	    for(int j = 0; j < 384; j = j + 1) begin
+		//checking dump of every address
+		@(posedge resp_rdy);
+		$fdisplay(fptr1, "%h", resp);
+		$display("dumping into CH1 file %b", resp);
+	    end	
+	  end
+	  6'b000010:begin
+	    for(int j = 0; j < 384; j = j + 1) begin
+		//checking dump of every address
+		@(posedge resp_rdy);
+		$fdisplay(fptr2, "%h", resp);
+		$display("dumping into CH2 file %b", resp);
+	    end	
+	  end
+	  6'b000011:begin
+	    for(int j = 0; j < 384; j = j + 1) begin
+		//checking dump of every address
+		@(posedge resp_rdy);
+		$fdisplay(fptr3, "%h", resp);
+		$display("dumping into CH3 file %b", resp);
+	    end	
+	  end	  
+	  6'b000100:begin
+	    for(int j = 0; j < 384; j = j + 1) begin
+		//checking dump of every address
+		@(posedge resp_rdy);
+		$fdisplay(fptr4, "%h", resp);
+		$display("dumping into CH4 file %b", resp);
+	    end	
+	  end
+	  6'b000101:begin
+	    for(int j = 0; j < 384; j = j + 1) begin
+		//checking dump of every address
+		@(posedge resp_rdy);
+		$fdisplay(fptr5, "%h", resp);
+		$display("dumping into CH5 file %b", resp);
+	    end	
+	  end
+	 endcase
+	$display("stop dumping");
 end
+endtask
+
+task PollCapDone;
+begin
+  $display("checking Capture");
+	fork
+		begin: timeout1
+			repeat(70000) @(posedge clk);
+			$display("ERROR: timeout due to lack of response");
+			$stop();
+		end	
+		begin
+			sndcmd({RD,TRIG_CFG,8'h00});
+			while (resp[5] == 0) begin
+			  @(posedge resp_rdy);
+			  clr_resp_rdy = 1; // assert clr_resp_rdy, kick down resp_rdy
+			  repeat (2) @(negedge clk);
+			  clr_resp_rdy = 0; // assert clr_resp_rdy, kick down resp_rdy
+			  sndcmd({RD,TRIG_CFG,8'h00});
+			end
+			@(posedge resp_rdy);
+			clr_resp_rdy = 1; // assert clr_resp_rdy, kick down resp_rdy
+			repeat (2) @(negedge clk);
+			clr_resp_rdy = 0; // assert clr_resp_rdy, kick down resp_rdy
+			disable timeout1;
+			$display("Capture Done!");
+		end					
+	join
+end
+endtask
