@@ -26,12 +26,36 @@ module capture_cntrl(clk, rst_n, wrt_smpl, we, waddr, trig_posH, trig_posL, run,
 	assign armed = clr_armed ? 1'b0 : (set_armed ? 1'b1 : armed); 
 
 	assign trig_pos = {trig_posH, trig_posL};
-
+		/****8
 	assign trig_cnt = trig_cnt_rst ? 0 : (trig_cnt_inc ? trig_cnt + 1 : trig_cnt);
 
 	assign smpl_cnt = smpl_cnt_rst ? 0 : (smpl_cnt_inc ? smpl_cnt + 1 : smpl_cnt);
 
 	assign waddr = waddr_rst ? 0 : (waddr_inc ? waddr + 1 : waddr);
+	****/
+	
+	
+	always_ff @ (posedge clk) begin 
+ 		if(waddr_rst) 
+ 			waddr <= 0; 
+ 		else if (waddr_inc)
+ 			waddr <= waddr + 1; 
+ 	end 
+	
+	always_ff @ (posedge clk) begin 
+ 		if(smpl_cnt_rst) 
+ 			smpl_cnt <= 0; 
+ 		else if (smpl_cnt_inc)
+ 			smpl_cnt <= smpl_cnt + 1; 
+ 	end 
+
+	always_ff @ (posedge clk) begin 
+ 		if(trig_cnt_rst) 
+ 			trig_cnt <= 0; 
+ 		else if (trig_cnt_inc)
+ 			trig_cnt <= trig_cnt + 1; 
+ 	end 
+	
 	
 	//main FSM		 
  	typedef enum reg [2:0] {IDLE, RUN, TRIG, SMPL, DONE} state_t; 
