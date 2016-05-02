@@ -32,10 +32,12 @@ read_file -format sverilog { ./dig_core.sv }
 read_file -format sverilog { ./trigger_logic.sv ./pwm8.sv ./dual_PWM.sv ./clk_rst_smpl.sv}
 read_file -format sverilog { ./reset_synch.sv }
 
+
 #################################
 #SET CURRENT DESIGN TO TOP LEVEL#
 #################################
 set current_design LA_dig
+
 
 ################################
 #CREATE A 1.25GHz (0.8ns) CLOCK#
@@ -51,11 +53,6 @@ set_dont_touch_network [get_pins iCLKRST/clk]
 create_generated_clock -name "smpl_clk" -source [get_port clk400MHz] -divide_by 1 [get_pins iCLKRST/smpl_clk]
 set_dont_touch_network [get_pins iCLKRST/smpl_clk]
 
-###############################################
-#INPUT DELAY 0.25ns ON ALL INPUTS EXCEPT CLOCK#
-###############################################
-set prim_inputs [remove_from_collection [all_inputs] [find port clk400MHz]]
-set_input_delay -clock clk 0.25 $prim_inputs
 
 ##############################################################
 #INPUT DELAY 0.25ns AFTER clk400MHz RISE FOR RST_n and locked#
@@ -75,43 +72,55 @@ set_input_delay -clock clk 0.25 $RX_input
 set CH_inputs {CH1H CH1L CH2H CH2L CH3H CH3L CH4H CH4L CH5H CH5L}
 set_input_delay -clock smpl_clk .25 -clock_fall $CH_inputs
 
+
 #####################################################
 #DRIVE STRENGTH ON ALL INPUTS EXCEPT CLOCK AND RESET#
 #####################################################
-#set all_inputs_no_rst_or_clk [remove_from_collection [remove_from_collection [all_inputs] [find port clk]] [find port rst_n]]
-set_driving_cell -lib_cell ND2D2BWP -from_pin A1 -library tcbn40lpbwptc [all_inputs] 
-#_no_rst_or_clk
+set all_inputs_no_clk400MHz [remove_from_collection [all_inputs] [find port clk400MHz]] 
+set_driving_cell -lib_cell ND2D2BWP -from_pin A1 -library tcbn40lpbwptc $all_inputs_no_clk400MHz 
+
 
 #######################################
 #OUTPUT DELAY OF 0.5ns FOR ALL OUTPUTS#
 #######################################
 set_output_delay -clock clk 0.5 [all_outputs]
 
+
 ##################################
 #SET LOAD OF .05pf ON ALL OUTPUTS#
 ##################################
 set_load .05 [all_outputs]
+
 
 ##################################
 #MAX TRANSITION TIME ON ALL NODES#
 ##################################
 set_max_transition .15 [current_design]
 
+
 #################
 #WIRE LOAD MODEL#
 #################
 set_wire_load_model -name TSMC32K_Lowk_Conservative -library tcbn40lpbwptc
+
 
 #############
 #1st COMPILE#
 #############
 compile -map_effort medium
 
-###############
-#FIX THE CLOCK#
-###############
+
+################
+#FIX THE CLOCKS#
+################
 set_clock_uncertainty 0.15 clk
+#set_clock_uncertainty 0.15 clk400MHz
+#set_clock_uncertainty 0.15 smpl_clk
+
 set_fix_hold clk
+set_fix_hold clk400MHz
+set_fix_hold smpl_clk
+
 
 #############
 #2nd COMPILE#
@@ -119,12 +128,19 @@ set_fix_hold clk
 ungroup -all -flatten
 compile -map_effort medium 
 
+check_design
+
+
 #########################
 #REPORT TIMINGS AND AREA#
 #########################
+report_timing -delay max
 report_timing -delay max > max_delay.rpt
+report_timing -delay min
 report_timing -delay min > min_delay.rpt
+report_area
 report_area > LA_dig_area.txt
+
 
 #######################
 #WRITE OUT THE NETLIST#
