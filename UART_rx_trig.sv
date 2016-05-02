@@ -10,9 +10,15 @@ output logic UARTtrig;
 logic [3:0] bit_cnt;
 logic [15:0] baud_counter;
 logic [8:0] rx_shift_reg;
+logic RX_flop;
 
 logic start, rdy, receiving;
 logic shift;
+
+always_ff @(posedge clk, negedge rst_n) begin
+	if(!rst_n) RX_flop <= 0;
+	else RX_flop <= RX;
+end
 
 //////////// bit_cnt  ///////////////
 always_ff @(posedge clk, negedge rst_n) begin
@@ -39,7 +45,7 @@ end
 //////////// rx_shift_reg ////////////////
 always_ff @(posedge clk) begin
 	if(shift)
-		rx_shift_reg <= {RX, rx_shift_reg[8:1]};
+		rx_shift_reg <= {RX_flop, rx_shift_reg[8:1]};
 end
 
 assign shift = (baud_counter == baud_cnt) ? 1 : 0; 
@@ -69,7 +75,7 @@ always_comb begin
 
 	case(state)
 		IDLE:
-			if(!RX) begin
+			if(!RX_flop) begin
 				start = 1;
 				next_state = RXING;
 			end
