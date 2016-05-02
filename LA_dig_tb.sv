@@ -28,6 +28,8 @@ reg strt_tx;					// kick off unit used for protocol triggering
 // Channel Dumps can be written to file to aid in testing //
 ///////////////////////////////////////////////////////////
 // setup file pointers here if going to do that
+int fptr1, fptr2, fptr3, fptr4, fptr5;
+
 
 ///////////////////////////
 // Define command bytes //
@@ -35,8 +37,8 @@ reg strt_tx;					// kick off unit used for protocol triggering
 // May or may not want to make some localparams to represent command bytes to LA core
 
 /////////////////////////////////
-localparam UART_triggering = 1'b0;	// set to true if testing UART based triggering
-localparam SPI_triggering = 1'b1;	// set to true if testing SPI based triggering
+localparam UART_triggering = 1'b1;	// set to true if testing UART based triggering
+localparam SPI_triggering = 1'b0;	// set to true if testing SPI based triggering
 
 
 ///// Instantiate Analog Front End model (provides stimulus to channels) ///////
@@ -77,22 +79,21 @@ assign clk = clk_div[1];
 
 //// Instantiate Master UART (mimics host commands) //////
 CommMaster iMSTR(.clk(clk), .rst_n(RST_n), .RX(TX), .TX(RX),
-		.cmd(host_cmd), .send_cmd(send_cmd),
-		.cmd_sent(cmd_sent), .resp_rdy(resp_rdy),
-		.resp(resp), .clr_resp_rdy(clr_resp_rdy));
+                     .cmd(host_cmd), .snd_cmd(send_cmd),
+					 .cmd_cmplt(cmd_sent), .rdy(resp_rdy),
+					 .rx_data(resp), .clr_rdy(clr_resp_rdy));
 					 
 ////////////////////////////////////////////////////////////////
 // Instantiate transmitter as source for protocol triggering //
 //////////////////////////////////////////////////////////////
-UART_tx iTX(.clk(clk), .rst_n(RST_n), .tx(tx_prot), .strt_tx(strt_tx),
+UART_tx iTX(.clk(clk), .rst_n(RST_n), .TX(tx_prot), .trmt(strt_tx),
         .tx_data(8'h96), .tx_done());
 					 
 ////////////////////////////////////////////////////////////////////
 // Instantiate SPI transmitter as source for protocol triggering //
 //////////////////////////////////////////////////////////////////
-SPI_mstr iSPI(.clk(clk),.rst_n(rst_n),.SS_n(SS_n),.SCLK(SCLK),.wrt(strt_tx),.done(done),
+SPI_mstr iSPI(.clk(clk),.rst_n(RST_n),.SS_n(SS_n),.SCLK(SCLK),.wrt(strt_tx),.done(done),
               .data_out(16'h6600),.MOSI(MOSI),.pos_edge(1'b0),.width8(1'b1));
-
 initial begin
   //   put your testing code here.
   
@@ -112,7 +113,7 @@ initial begin
   chkresp(8'hA5);
   repeat(10) @ (negedge clk);
   sndcmd({RD,TRIG_CFG, 8'h00});
-  chkresp(8'b0000_0010);
+  chkresp(8'b0001_0010);
   
   //wrong cmd test
   sndcmd({2'b11,VIH, 8'h46});
