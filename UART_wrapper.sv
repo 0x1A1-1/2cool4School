@@ -72,7 +72,8 @@ always_comb begin
 			if(byte_rdy) begin
 				set_cmd_rdy = 1;
 				next_state = DONE;
-			end
+			end else
+				next_state = LOW_BYTE;
 		default:
 			if(clr_cmd_rdy) begin
 				clr_rdy = 1;
