@@ -26,14 +26,6 @@ module capture_cntrl(clk, rst_n, wrt_smpl, we, waddr, trig_posH, trig_posL, run,
 	assign armed = clr_armed ? 1'b0 : (set_armed ? 1'b1 : armed); 
 
 	assign trig_pos = {trig_posH, trig_posL};
-		/****8
-	assign trig_cnt = trig_cnt_rst ? 0 : (trig_cnt_inc ? trig_cnt + 1 : trig_cnt);
-
-	assign smpl_cnt = smpl_cnt_rst ? 0 : (smpl_cnt_inc ? smpl_cnt + 1 : smpl_cnt);
-
-	assign waddr = waddr_rst ? 0 : (waddr_inc ? waddr + 1 : waddr);
-	****/
-	
 	
 	always_ff @ (posedge clk) begin 
  		if(waddr_rst) 
@@ -107,6 +99,7 @@ module capture_cntrl(clk, rst_n, wrt_smpl, we, waddr, trig_posH, trig_posL, run,
 						nxt_state = RUN;
 					
 			TRIG:	if (trig_cnt == trig_pos) begin
+						we = 1;
 						set_capture_done = 1'b1;
 						clr_armed = 1'b1;
 						nxt_state = DONE;
