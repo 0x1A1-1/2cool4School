@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-module LA_dig_tb();
+module LA_dig_tb2();
 			
 //// Interconnects to DUT/support defined as type wire /////
 wire clk400MHz,locked;			// PLL output signals to DUT
@@ -28,6 +28,9 @@ reg strt_tx;					// kick off unit used for protocol triggering
 // Channel Dumps can be written to file to aid in testing //
 ///////////////////////////////////////////////////////////
 // setup file pointers here if going to do that
+int fptr1, fptr2, fptr3, fptr4, fptr5;
+
+
 
 ///////////////////////////
 // Define command bytes //
@@ -77,20 +80,20 @@ assign clk = clk_div[1];
 
 //// Instantiate Master UART (mimics host commands) //////
 CommMaster iMSTR(.clk(clk), .rst_n(RST_n), .RX(TX), .TX(RX),
-		.cmd(host_cmd), .send_cmd(send_cmd),
-		.cmd_sent(cmd_sent), .resp_rdy(resp_rdy),
-		.resp(resp), .clr_resp_rdy(clr_resp_rdy));
+                     .cmd(host_cmd), .snd_cmd(send_cmd),
+					 .cmd_cmplt(cmd_sent), .rdy(resp_rdy),
+					 .rx_data(resp), .clr_rdy(clr_resp_rdy));
 					 
 ////////////////////////////////////////////////////////////////
 // Instantiate transmitter as source for protocol triggering //
 //////////////////////////////////////////////////////////////
-UART_tx iTX(.clk(clk), .rst_n(RST_n), .tx(tx_prot), .strt_tx(strt_tx),
+UART_tx iTX(.clk(clk), .rst_n(RST_n), .TX(tx_prot), .trmt(strt_tx),
         .tx_data(8'h96), .tx_done());
 					 
 ////////////////////////////////////////////////////////////////////
 // Instantiate SPI transmitter as source for protocol triggering //
 //////////////////////////////////////////////////////////////////
-SPI_mstr iSPI(.clk(clk),.rst_n(rst_n),.SS_n(SS_n),.SCLK(SCLK),.wrt(strt_tx),.done(done),
+SPI_mstr iSPI(.clk(clk),.rst_n(RST_n),.SS_n(SS_n),.SCLK(SCLK),.wrt(strt_tx),.done(done),
               .data_out(16'h6600),.MOSI(MOSI),.pos_edge(1'b0),.width8(1'b1));
 
 initial begin
@@ -110,16 +113,32 @@ initial begin
   //second test: channel capture, triggering, dumping test
  
   //set trigcfg to disable UART, SPI Triggering
+  repeat(10) @ (negedge clk); 
   sndcmd({WR,TRIG_CFG, 8'b0001_0011});  
+  chkresp(8'hA5);
+  
+  sndcmd({WR,DECIM,8'h02});
+  chkresp(8'hA5);
 
   //set CH1TrigCfg pos_edge, Ch2 Neg edge, CH3 High level, CH4 Low Level, CH5 dont care
-  sndcmd({WR,CH1TRIG_CFG, 8'b0001_0000});  
-  sndcmd({WR,CH2TRIG_CFG, 8'b0000_1000});  
-  sndcmd({WR,CH3TRIG_CFG, 8'b0000_0100});  
-  sndcmd({WR,CH4TRIG_CFG, 8'b0000_0010});  
-  sndcmd({WR,CH5TRIG_CFG, 8'b0000_0001});  
+  repeat(10) @ (negedge clk); 
+  sndcmd({WR,CH1TRIG_CFG, 8'b0000_1000});
+  chkresp(8'hA5);
+  repeat(10) @ (negedge clk); 	
+  sndcmd({WR,CH2TRIG_CFG, 8'b0000_1000}); 
+  chkresp(8'hA5);
+  repeat(10) @ (negedge clk);   
+  sndcmd({WR,CH3TRIG_CFG, 8'b0000_1000});
+  chkresp(8'hA5);
+  repeat(10) @ (negedge clk);  
+  sndcmd({WR,CH4TRIG_CFG, 8'b0000_1000});
+  chkresp(8'hA5);
+  repeat(10) @ (negedge clk);  
+  sndcmd({WR,CH5TRIG_CFG, 8'b0000_1000});
+  chkresp(8'hA5);  
   
   //dump test
+
   PollCapDone;
   
   sndcmd({DUMP,DPCH1, 8'h00});
