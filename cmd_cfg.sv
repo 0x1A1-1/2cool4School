@@ -236,7 +236,7 @@ module cmd_cfg(	clk, rst_n, cmd, cmd_rdy, resp_sent, set_capture_done,
 		else 
 			resp <= response;
 	end
-	//*/
+	*/
 
 	assign resp = response;
 
