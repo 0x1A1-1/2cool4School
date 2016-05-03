@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-module LA_dig_tb();
+module LA_dig_tb_cov();
 			
 //// Interconnects to DUT/support defined as type wire /////
 wire clk400MHz,locked;			// PLL output signals to DUT
