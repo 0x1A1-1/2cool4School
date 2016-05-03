@@ -172,106 +172,155 @@ endtask
 
 task readWrite;
 	begin
-	  //simple test, omly read/write
-	  
-	  //initialize design
-	  strt_tx = 0;
-	  initialize;
-	 
-	  //first test: writing to trig_cfg and read from trig_cfg
-	  repeat(10) @ (negedge clk); 
-	  sndcmd({WR,TRIG_CFG, 8'h16});
-	  chkresp(8'hA5);
-	  
-	  //wrong cmd test
-	  repeat(10) @ (negedge clk); 
-	  sndcmd({2'b11,VIH, 8'h46});
-	  chkresp(8'hEE);
-	  
-	  //change trig_pos
-	  repeat(10) @ (negedge clk);   
-	  sndcmd({WR,TRIG_POS_H,8'b0111_1111});
-	  chkresp(8'hA5);
-	  sndcmd({WR,TRIG_POS_L,8'hff});
-	  chkresp(8'hA5);
-		
-	  //change VIH,VIL
-	  repeat(10) @ (negedge clk);   
-	  sndcmd({WR,VIH,8'hff});
-	  chkresp(8'hA5);
-	  sndcmd({WR,VIL,8'h00});
-	  chkresp(8'hA5);
-	  
-	  //change CHxTrigCfg
-	  repeat(10) @ (negedge clk);   
-	  sndcmd({WR,CH1TRIG_CFG,8'b0001_1111});
-	  chkresp(8'hA5);
-	  repeat(10) @ (negedge clk); 
-	  sndcmd({WR,CH2TRIG_CFG,8'h16});
-	  chkresp(8'hA5);
-	  
-	  
-	  //read what we just put in
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,TRIG_POS_H, 8'h00});
-	  chkresp(8'b0111_1111);
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,TRIG_POS_L, 8'h00});
-	  chkresp(8'hff);
-	  repeat(10) @ (negedge clk);   
-	  sndcmd({RD,TRIG_CFG, 8'h00});
-	  chkresp(8'h16);
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,CH1TRIG_CFG, 8'h00});
-	  chkresp(8'b0001_1111); 
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,CH2TRIG_CFG, 8'h00});
-	  chkresp(8'h16);
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,CH3TRIG_CFG, 8'h00});
-	  chkresp(8'b01); 
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,CH4TRIG_CFG, 8'h00});
-	  chkresp(8'h01);
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,CH5TRIG_CFG, 8'h00});
-	  chkresp(8'h01);
-	  
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,DECIM, 8'h00});
-	  chkresp(8'h00);
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,VIL, 8'h00});
-	  chkresp(8'b00); 
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,VIH, 8'h00});
-	  chkresp(8'hff);
-	  
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,MTCH_H, 8'h00});
-	  chkresp(8'h00);
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,MTCH_L, 8'h00});
-	  chkresp(8'h00);
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,BAUD_CNT_H, 8'h00});
-	  chkresp(8'h06); 
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,BAUD_CNT_L, 8'h00});
-	  chkresp(8'hC8);
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,MSK_H, 8'h00});
-	  chkresp(8'h00);
-	  repeat(10) @ (negedge clk);
-	  sndcmd({RD,MSK_L, 8'h00});
-	  chkresp(8'h00);
-	  
-	   repeat(10) @ (negedge clk);
-	   sndcmd({RD,8'hff, 8'h00});
-	   chkresp(8'hEE);
-	   repeat(10) @ (negedge clk);
-	   sndcmd({WR,8'hff, 8'h00});
-	   chkresp(8'hEF);
+		//simple test, omly read/write
+
+		//initialize design
+		strt_tx = 0;
+		initialize;
+
+		//first test: writing to trig_cfg and read from trig_cfg
+		repeat(10) @ (negedge clk); 
+		sndcmd({WR,TRIG_CFG, 8'h16});
+		chkresp(8'hA5);
+
+		//wrong cmd test
+		repeat(10) @ (negedge clk); 
+		sndcmd({2'b11,VIH, 8'h46});
+		chkresp(8'hEE);
+
+		//change trig_pos
+		repeat(10) @ (negedge clk);   
+		sndcmd({WR,TRIG_POS_H,8'b0111_1111});
+		chkresp(8'hA5);
+		sndcmd({WR,TRIG_POS_L,8'hff});
+		chkresp(8'hA5);
+
+		//change VIH,VIL
+		repeat(10) @ (negedge clk);   
+		sndcmd({WR,VIH,8'hff});
+		chkresp(8'hA5);
+		sndcmd({WR,VIL,8'h00});
+		chkresp(8'hA5);
+
+		//change CHxTrigCfg
+		repeat(10) @ (negedge clk);   
+		sndcmd({WR,CH1TRIG_CFG,8'b0001_1111});
+		chkresp(8'hA5);
+		repeat(10) @ (negedge clk); 
+		sndcmd({WR,CH2TRIG_CFG,8'h16});
+		chkresp(8'hA5);
+
+		//change DECIM
+                repeat(10) @ (negedge clk);
+		sndcmd({WR,DECIM, 8'b0000_0001}); 
+		chkresp(8'hA5); 
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,DECIM, 8'h00});
+		chkresp(8'h01);
+		repeat(10) @ (negedge clk);
+		sndcmd({WR,DECIM, 8'b0000_0010}); 
+		chkresp(8'hA5); 
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,DECIM, 8'h00});
+		chkresp(8'h02);
+		repeat(10) @ (negedge clk);
+		sndcmd({WR,DECIM, 8'b0000_0011}); 
+		chkresp(8'hA5); 
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,DECIM, 8'h00});
+		chkresp(8'h03);
+		repeat(10) @ (negedge clk);
+		sndcmd({WR,DECIM, 8'b0000_0100}); 
+		chkresp(8'hA5); 
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,DECIM, 8'h00});
+		chkresp(8'h04);
+		repeat(10) @ (negedge clk);
+		sndcmd({WR,DECIM, 8'b0000_0101}); 
+		chkresp(8'hA5); 
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,DECIM, 8'h00});
+		chkresp(8'h05);
+		repeat(10) @ (negedge clk);
+		sndcmd({WR,DECIM, 8'b0000_0110}); 
+		chkresp(8'hA5); 
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,DECIM, 8'h00});
+		chkresp(8'h06);
+		repeat(10) @ (negedge clk);
+		sndcmd({WR,DECIM, 8'b0000_0111}); 
+		chkresp(8'h07); 
+		repeat(10) @ (negedge clk);
+		sndcmd({WR,DECIM, 8'b0000_1000}); 
+		chkresp(8'hA5); 
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,DECIM, 8'h00});
+		chkresp(8'h08);
+		repeat(10) @ (negedge clk);
+		sndcmd({WR,DECIM, 8'b0000_1001}); 
+		chkresp(8'hA5); 
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,DECIM, 8'h00});
+		chkresp(8'h09);
+
+		//read what we just put in
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,TRIG_POS_H, 8'h00});
+		chkresp(8'b0111_1111);
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,TRIG_POS_L, 8'h00});
+		chkresp(8'hff);
+		repeat(10) @ (negedge clk);   
+		sndcmd({RD,TRIG_CFG, 8'h00});
+		chkresp(8'h16);
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,CH1TRIG_CFG, 8'h00});
+		chkresp(8'b0001_1111); 
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,CH2TRIG_CFG, 8'h00});
+		chkresp(8'h16);
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,CH3TRIG_CFG, 8'h00});
+		chkresp(8'b01); 
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,CH4TRIG_CFG, 8'h00});
+		chkresp(8'h01);
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,CH5TRIG_CFG, 8'h00});
+		chkresp(8'h01);
+
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,VIL, 8'h00});
+		chkresp(8'b00); 
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,VIH, 8'h00});
+		chkresp(8'hff);
+
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,MTCH_H, 8'h00});
+		chkresp(8'h00);
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,MTCH_L, 8'h00});
+		chkresp(8'h00);
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,BAUD_CNT_H, 8'h00});
+		chkresp(8'h06); 
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,BAUD_CNT_L, 8'h00});
+		chkresp(8'hC8);
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,MSK_H, 8'h00});
+		chkresp(8'h00);
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,MSK_L, 8'h00});
+		chkresp(8'h00);
+
+		repeat(10) @ (negedge clk);
+		sndcmd({RD,8'h1f, 8'h00});
+		chkresp(8'hEE);
+		repeat(10) @ (negedge clk);
+		sndcmd({WR,6'h1f, 8'h00});
+		chkresp(8'hEE);
 	end
 endtask
 
@@ -318,64 +367,34 @@ task decTriPos;
 	  initialize;
 	 
 	  //third test: channel capture, triggering, dumping test, but also changes decimator, and trig_pos number
-	 
-	  //set trigcfg to disable UART, SPI Triggering
-	  sndcmd({WR,TRIG_CFG, 8'b001_0011});  
+	  repeat(10) @ (negedge clk);
+	  sndcmd({WR,TRIG_POS_H, 8'b0000_0001});
+	  chkresp(8'hA5); 
+	  repeat(10) @ (negedge clk);  
+	  sndcmd({WR,TRIG_POS_L, 8'b0000_0000}); 
 	  chkresp(8'hA5);  
-	  
 
 	  //set CH1TrigCfg pos_edge, Ch2 Neg edge, CH3 High level, CH4 Low Level, CH5 dont care
 	  repeat(10) @ (negedge clk); 
-	  sndcmd({WR,CH1TRIG_CFG, 8'b0000_1000});
+	  sndcmd({WR,CH1TRIG_CFG, 8'b0001_0000});
 	  chkresp(8'hA5);
 	  repeat(10) @ (negedge clk); 	
 	  sndcmd({WR,CH2TRIG_CFG, 8'b0000_1000}); 
 	  chkresp(8'hA5);
 	  repeat(10) @ (negedge clk);   
-	  sndcmd({WR,CH3TRIG_CFG, 8'b0000_1000});
+	  sndcmd({WR,CH3TRIG_CFG, 8'b0000_0100});
 	  chkresp(8'hA5);
 	  repeat(10) @ (negedge clk);  
-	  sndcmd({WR,CH4TRIG_CFG, 8'b0000_1000});
+	  sndcmd({WR,CH4TRIG_CFG, 8'b0000_0010});
 	  chkresp(8'hA5);
 	  repeat(10) @ (negedge clk);  
-	  sndcmd({WR,CH5TRIG_CFG, 8'b0000_1000});
+	  sndcmd({WR,CH5TRIG_CFG, 8'b0000_0001});
 	  chkresp(8'hA5);    
 	  
-	  //set decimator & trig_pos
-	  repeat(10) @ (negedge clk);
-	  sndcmd({WR,DECIM, 8'b0000_0001}); 
-	  chkresp(8'hA5); 
-	  repeat(10) @ (negedge clk);
-	  sndcmd({WR,DECIM, 8'b0000_0010}); 
-	  chkresp(8'hA5); 
-	  repeat(10) @ (negedge clk);
-	  sndcmd({WR,DECIM, 8'b0000_0011}); 
-	  chkresp(8'hA5); 
-	  repeat(10) @ (negedge clk);
-	  sndcmd({WR,DECIM, 8'b0000_0100}); 
-	  chkresp(8'hA5); 
-	  repeat(10) @ (negedge clk);
-	  sndcmd({WR,DECIM, 8'b0000_0101}); 
-	  chkresp(8'hA5); 
-	  repeat(10) @ (negedge clk);
-	  sndcmd({WR,DECIM, 8'b0000_0110}); 
-	  chkresp(8'hA5); 
-	  repeat(10) @ (negedge clk);
-	  sndcmd({WR,DECIM, 8'b0000_0111}); 
-	  chkresp(8'hA5); 
-	  repeat(10) @ (negedge clk);
-	  sndcmd({WR,DECIM, 8'b0000_1000}); 
-	  chkresp(8'hA5); 
-	  repeat(10) @ (negedge clk);
-	  sndcmd({WR,DECIM, 8'b0000_1001}); 
-	  chkresp(8'hA5); 
-	  repeat(10) @ (negedge clk);
-	  sndcmd({WR,TRIG_POS_H, 8'b0000_1111});
-	  chkresp(8'hA5); 
-	  repeat(10) @ (negedge clk);  
-	  sndcmd({WR,TRIG_POS_L, 8'b1111_0000}); 
+	  //set trigcfg to disable UART, SPI Triggering
+	  sndcmd({WR,TRIG_CFG, 6'b01_0011});  
 	  chkresp(8'hA5);  
-
+	  
 	end
 endtask
 
@@ -387,9 +406,6 @@ task UARTRIG;
 
 		//forth test: UART TRIGGER, so bit0 of trigcfg should be 0
 		repeat(10) @ (negedge clk);
-		sndcmd({WR,TRIG_CFG, 8'b0001_0010});
-		chkresp(8'hA5);
-		repeat(10) @ (negedge clk);
 		sndcmd({WR,BAUD_CNT_H, 8'b0001_0010});
 		chkresp(8'hA5);
 		repeat(10) @ (negedge clk);
@@ -400,6 +416,9 @@ task UARTRIG;
 		chkresp(8'hA5);
 		repeat(10) @ (negedge clk);
 		sndcmd({WR,MTCH_L, 8'b1111_0000});
+		chkresp(8'hA5);
+		repeat(10) @ (negedge clk);
+		sndcmd({WR,TRIG_CFG, 8'b0001_0010});
 		chkresp(8'hA5);
 
 	end
